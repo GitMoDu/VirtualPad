@@ -75,7 +75,7 @@ protected:
 
 class IDispatcher {
 public:
-	virtual void OnDispatch();
+	virtual void OnDataUpdated();
 	virtual void OnControllerStateChanged(const bool connected);
 };
 

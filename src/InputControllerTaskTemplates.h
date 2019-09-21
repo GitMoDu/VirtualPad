@@ -11,56 +11,13 @@
 #include <IFilterTaskInclude.h>
 #include <AxisTemplates.h>
 #include <IInputController.h>
+#include <IFilterStepperDispatcherTask.h>
 
 
 #include <IRumblerDAC.h>
 #include <IRumbleAnimator.h>
 #include <RumbleAnimatorTask.h>
-
-
-//Templated dispatcher, fires an light-weight, non-typed event to the Dispacther,
-// as soon as the data is updated.
-template <const uint32_t UpdatePeriod,
-	const uint8_t MaxCount = 5>
-	class IFilterStepperDispatcherTask : public IFilterStepperTask<UpdatePeriod, MaxCount>
-{
-
-protected:
-	IDispatcher* Dispatcher = nullptr;
-
-public:
-	IFilterStepperDispatcherTask(Scheduler* scheduler, IDispatcher* dispatcher = nullptr)
-		: IFilterStepperTask<UpdatePeriod, MaxCount>(scheduler, false)
-	{
-		Dispatcher = dispatcher;
-	}
-
-	void OnDisable()
-	{
-		//Serial.println(F("Stepper paused"));
-	}
-
-	bool OnEnable()
-	{
-		//Serial.println(F("Stepper Running"));
-		return true;
-	}
-
-	void SetDispatcher(IDispatcher* dispatcher)
-	{
-		Dispatcher = dispatcher;
-		this->enableIfNot();
-	}
-
-protected:
-	void OnDataUpdated()
-	{
-		if (Dispatcher != nullptr)
-		{
-			Dispatcher->OnDispatch();
-		}
-	}
-};
+#include <RumbleAnimatorTask.h>
 
 template<const uint32_t SamplePeriodMillis = 5,
 	const uint32_t FilterPeriodMillis = 8>
