@@ -21,7 +21,7 @@
 
 template<const uint32_t SamplePeriodMillis = 5,
 	const uint32_t FilterPeriodMillis = 8>
-	class TemplateControllerTask : public IInputController
+	class TemplateControllerTask : public Task, public virtual IInputController
 {
 private:
 	static const uint8_t FilterCount = 6;
@@ -46,7 +46,8 @@ protected:
 
 public:
 	TemplateControllerTask(Scheduler* scheduler, IDispatcher* dispatcher = nullptr)
-		: IInputController(scheduler, SamplePeriodMillis)
+		: Task(SamplePeriodMillis, TASK_FOREVER, scheduler, false)
+		, IInputController()
 		, StepperTask(scheduler, dispatcher)
 		, RumbleAnimator(scheduler)
 		, FilterJoy1X()
@@ -132,6 +133,21 @@ public:
 
 
 protected:
+	void Enable()
+	{
+		enableIfNot();
+	}
+
+	void Disable()
+	{
+		disable();
+	}
+
+	void Delay(const uint32_t millis)
+	{
+		Task::delay(millis);
+	}
+
 	void PauseStepper()
 	{
 		StepperTask.disable();

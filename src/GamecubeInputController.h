@@ -26,9 +26,8 @@ template<
 {
 private:
 	//Template members for use in this class.
-	using IInputController::DACOutput;
-	using IInputController::Delay;
-	using IInputController::Enable;
+	using TemplateControllerTask<SamplePeriodMillis, UpdatePeriodMillis>::Delay;
+	using TemplateControllerTask<SamplePeriodMillis, UpdatePeriodMillis>::Enable;
 	using TemplateControllerTask<SamplePeriodMillis, UpdatePeriodMillis>::OnControllerReadOk;
 	using TemplateControllerTask<SamplePeriodMillis, UpdatePeriodMillis>::OnControllerFail;
 
