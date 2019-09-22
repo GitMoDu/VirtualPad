@@ -28,6 +28,12 @@ public:
 		up = false;
 		down = false;
 	}
+
+	virtual bool GetLeft() { return false; }
+	virtual bool GetRight() { return false; }
+	virtual bool GetUp() { return false; }
+	virtual bool GetDown() { return false; }
+
 	virtual bool GetButton0() { return false; }
 	virtual bool GetButton1() { return false; }
 	virtual bool GetButton2() { return false; }

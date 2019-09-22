@@ -103,8 +103,13 @@ public:
 		right = RawData.buttons & (1 << GamecubeButtons::Right);
 		up = RawData.buttons & (1 << GamecubeButtons::Up);
 		down = RawData.buttons & (1 << GamecubeButtons::Down);
-
 	}
+
+	virtual bool GetLeft() { return  RawData.buttons & (1 << GamecubeButtons::Left); }
+	virtual bool GetRight() { return  RawData.buttons & (1 << GamecubeButtons::Right); }
+	virtual bool GetUp() { return RawData.buttons & (1 << GamecubeButtons::Up); }
+	virtual bool GetDown() { return RawData.buttons & (1 << GamecubeButtons::Down); }
+
 	virtual bool GetButton0() { return RawData.buttons & (1 << GamecubeButtons::A); }
 	virtual bool GetButton1() { return RawData.buttons & (1 << GamecubeButtons::B); }
 	virtual bool GetButton2() { return RawData.buttons & (1 << GamecubeButtons::X); }
