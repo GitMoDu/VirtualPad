@@ -59,15 +59,15 @@ public:
 	static const uint8_t	JoyFilterSaturation = 140;
 
 	//Joystick C.
-	static const uint8_t	JoyCXMin = 25;
-	static const uint8_t	JoyCXMax = 233;
-	static const int8_t		JoyCXOffset = -8;
+	static const uint8_t	JoyCXMin = 33;
+	static const uint8_t	JoyCXMax = 215;
+	static const int8_t		JoyCXOffset = -2;
 
-	static const uint8_t	JoyCYMin = 33;
+	static const uint8_t	JoyCYMin = 35;
 	static const uint8_t	JoyCYMax = 223;
-	static const int8_t		JoyCYOffset = 0;
+	static const int8_t		JoyCYOffset = 6;
 
-	static const uint8_t	JoyCDeadZoneRadius = 4;
+	static const uint8_t	JoyCDeadZoneRadius = 2;
 	static const uint8_t	JoyCFilterSaturation = 140;
 
 	//Trigers.
