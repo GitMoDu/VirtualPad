@@ -52,5 +52,57 @@ public:
 	virtual void OnControllerStateChanged(const bool connected);
 };
 
+class ButtonPress
+{
+private:
+	bool Up = false;
+
+public:
+	bool Parse(const bool button)
+	{
+		if (Up && !button)
+		{
+			Up = false;
+			return true;
+		}
+		else if (!Up && button)
+		{
+			Up = true;
+		}
+
+		return false;
+	}
+};
+
+class TimedButtonPress
+{
+private:
+	bool Up = false;
+	uint32_t Time = 0;
+
+public:
+	bool Parse(const bool button)
+	{
+		if (Up && !button)
+		{
+			Up = false;
+			Time = millis() - Time;
+			return true;
+		}
+		else if (!Up && button)
+		{
+			Time = millis();
+			Up = true;
+		}
+
+		return false;
+	}
+
+	uint32_t GetDuration()
+	{
+		return Time;
+	}
+};
+
 #endif
 
