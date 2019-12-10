@@ -85,6 +85,16 @@ public:
 		return true;
 	}
 
+	void StartController()
+	{
+		enableIfNot();
+	}
+
+	void StopController()
+	{
+		disable();
+	}
+
 	virtual bool Callback()
 	{
 		return false;
