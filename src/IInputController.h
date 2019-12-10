@@ -21,6 +21,7 @@ public:
 	virtual uint16_t GetJoy2Y() { return 0; }
 	virtual uint16_t GetTriggerL() { return 0; }
 	virtual uint16_t GetTriggerR() { return 0; }
+
 	virtual void GetDirection(bool& left, bool& right, bool& up, bool& down)
 	{
 		left = false;
@@ -28,7 +29,6 @@ public:
 		up = false;
 		down = false;
 	}
-
 	virtual bool GetLeft() { return false; }
 	virtual bool GetRight() { return false; }
 	virtual bool GetUp() { return false; }
@@ -43,6 +43,10 @@ public:
 	virtual bool GetButton6() { return false; }
 	virtual bool GetButton7() { return false; }
 
+public://Interface controls, should return one of the existing buttons.
+	virtual bool GetButtonAccept() { return false; }
+	virtual bool GetButtonReject() { return false; }
+	virtual bool GetButtonHome() { return false; }
 
 };
 
