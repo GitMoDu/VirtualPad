@@ -53,7 +53,7 @@ public://Interface controls, should return one of the existing buttons.
 class IDispatcher {
 public:
 	virtual void OnDataUpdated();
-	virtual void OnControllerStateChanged(const bool connected);
+	virtual void OnStateChanged(const bool connected);
 };
 
 class ButtonPress
@@ -91,6 +91,7 @@ public:
 		{
 			Up = false;
 			Time = millis() - Time;
+
 			return true;
 		}
 		else if (!Up && button)
