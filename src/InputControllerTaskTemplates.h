@@ -19,9 +19,9 @@
 #include <RumbleAnimatorTask.h>
 #include <RumbleAnimatorTask.h>
 
-template<const uint32_t SamplePeriodMillis = 5,
-	const uint32_t FilterPeriodMillis = 8>
-	class TemplateControllerTask : public Task, public virtual IInputController
+template<const uint32_t SamplePeriodMillis = 6,
+	const uint32_t FilterPeriodMillis = 3>
+	class TemplateControllerTask : protected Task, public virtual IInputController
 {
 protected:
 	EMAFilter FilterJoy1X;

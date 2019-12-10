@@ -14,14 +14,11 @@
 // With an official controller attached, there is a typical interval of about 6ms between successive updates.
 // Each update lasts around 348us.
 // in http://www.int03.co.uk/crema/hardware/gamecube/gc-control.html
-
-
-
 template<
 	typename Calibration,
 	const uint8_t Pin,
-	const uint32_t SamplePeriodMillis = 5,
-	const uint32_t UpdatePeriodMillis = 5>
+	const uint32_t SamplePeriodMillis = 6,
+	const uint32_t UpdatePeriodMillis = 3>
 	class GamecubeControllerCarInputControllerTask : public TemplateControllerTask<SamplePeriodMillis, UpdatePeriodMillis>
 {
 private:
