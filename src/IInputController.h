@@ -98,7 +98,39 @@ public:
 		return false;
 	}
 
-	uint32_t GetDuration()
+	uint32_t GetDurationMillis()
+	{
+		return Time;
+	}
+};
+
+template<const uint32_t MinDurationMillis>
+class MinTimedButtonPress
+{
+private:
+	bool Up = false;
+	uint32_t Time = 0;
+
+public:
+	bool Parse(const bool button)
+	{
+		if (Up && !button)
+		{
+			Up = false;
+			Time = millis() - Time;
+
+			return Time > MinDurationMillis;
+		}
+		else if (!Up && button)
+		{
+			Time = millis();
+			Up = true;
+		}
+
+		return false;
+	}
+
+	uint32_t GetDurationMillis()
 	{
 		return Time;
 	}
