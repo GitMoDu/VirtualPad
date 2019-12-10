@@ -83,8 +83,8 @@ public:
 };
 
 const uint32_t GAMECUBE_CONTROLLER_PIN = PA0;
-const uint32_t ControllerSamplePeriodMillis = 4;
-const uint32_t ControllerUpdatePeriodMillis = 2;
+const uint32_t ControllerSamplePeriodMillis = 5;
+const uint32_t ControllerUpdatePeriodMillis = 3;
 
 
 GamecubeControllerCarInputControllerTask<GamecubeControllerCalibration, GAMECUBE_CONTROLLER_PIN, ControllerSamplePeriodMillis, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase);
