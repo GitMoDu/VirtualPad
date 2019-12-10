@@ -69,6 +69,10 @@ public:
 	{
 		Connected = false;
 		StopForceFeedback();
+
+#ifdef DEBUG_IINPUT_CONTROLLER
+		Serial.println(F("Controller disabled."));
+#endif
 		PauseStepper();
 		StepperTask.OnStateChanged(false);
 	}
