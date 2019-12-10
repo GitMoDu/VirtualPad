@@ -70,6 +70,7 @@ public:
 		Connected = false;
 		StopForceFeedback();
 		PauseStepper();
+		StepperTask.OnStateChanged(false);
 	}
 
 	virtual bool OnEnable()
