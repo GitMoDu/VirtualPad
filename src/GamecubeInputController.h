@@ -119,6 +119,11 @@ public:
 	virtual bool GetButton6() { return RawData.buttons & (1 << GamecubeButtons::R); }
 	virtual bool GetButton7() { return RawData.buttons & (1 << GamecubeButtons::Start); }
 
+	//Interface controls redirection.
+	virtual bool GetButtonAccept() { return GetButton0(); }
+	virtual bool GetButtonReject() { return GetButton1(); }
+	virtual bool GetButtonHome() { return GetButton7(); }
+
 private:
 	GameCubeData_t RawData;
 
