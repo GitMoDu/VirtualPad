@@ -23,10 +23,6 @@ template<const uint32_t SamplePeriodMillis = 5,
 	const uint32_t FilterPeriodMillis = 8>
 	class TemplateControllerTask : public Task, public virtual IInputController
 {
-private:
-	static const uint8_t FilterCount = 6;
-	IFilterStepperDispatcherTask<FilterPeriodMillis, FilterCount> StepperTask;
-
 protected:
 	EMAFilter FilterJoy1X;
 	EMAFilter FilterJoy1Y;
@@ -35,14 +31,16 @@ protected:
 
 	EMAFilter FilterTriggerL;
 	EMAFilter FilterTriggerR;
+	static const uint8_t FilterCount = 6;
 
 	RumbleAnimatorTask<SamplePeriodMillis> RumbleAnimator;
 
-	IDispatcher* Dispatcher = nullptr;
-
 	bool Connected = false;
 
-	const uint32_t ReconnectPeriodMillis = 10;
+	const uint32_t ReconnectPeriodMillis = 50;
+
+private:
+	IFilterStepperDispatcherTask<FilterPeriodMillis, FilterCount> StepperTask;
 
 public:
 	TemplateControllerTask(Scheduler* scheduler, IDispatcher* dispatcher = nullptr)
@@ -64,9 +62,6 @@ public:
 		StepperTask.AddFilter(FilterTriggerL);
 		StepperTask.AddFilter(FilterTriggerR);
 
-		Dispatcher = dispatcher;
-		StepperTask.SetDispatcher(Dispatcher);
-
 		Connected = false;
 	}
 
@@ -80,7 +75,7 @@ public:
 	virtual bool OnEnable()
 	{
 		Connected = false;
-		ResumeStepper();
+		StepperTask.enableIfNot();
 
 		return true;
 	}
@@ -92,8 +87,7 @@ public:
 
 	void SetDispatcher(IDispatcher* dispatcher)
 	{
-		Dispatcher = dispatcher;
-		StepperTask.SetDispatcher(Dispatcher);
+		StepperTask.SetDispatcher(dispatcher);
 	}
 
 	inline uint16_t GetJoy1X()
@@ -153,11 +147,6 @@ protected:
 		StepperTask.disable();
 	}
 
-	void ResumeStepper()
-	{
-		StepperTask.enableIfNot();
-	}
-
 	void OnControllerReadOk()
 	{
 		if (!Connected)
@@ -166,11 +155,8 @@ protected:
 #ifdef DEBUG_IINPUT_CONTROLLER
 			Serial.println(F("Controller plugged in"));
 #endif
-			ResumeStepper();
-			if (Dispatcher != nullptr)
-			{
-				Dispatcher->OnControllerStateChanged(true);
-			}
+			StepperTask.enableIfNot();
+			StepperTask.OnStateChanged(true);
 			Delay(0);
 		}
 	}
@@ -184,10 +170,7 @@ protected:
 			Serial.println(F("Error reading controller"));
 #endif
 			PauseStepper();
-			if (Dispatcher != nullptr)
-			{
-				Dispatcher->OnControllerStateChanged(false);
-			}
+			StepperTask.OnStateChanged(false);
 		}
 
 		Delay(ReconnectPeriodMillis);
