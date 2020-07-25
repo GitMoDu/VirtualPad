@@ -3,22 +3,15 @@
 #ifndef _I_INPUT_CONTROLLER_h
 #define _I_INPUT_CONTROLLER_h
 
-#define _TASK_OO_CALLBACKS
-#include <TaskSchedulerDeclarations.h>
 
-
-
-
-#include <IRumblerDAC.h>
-
-
+// Virtual controller interface.
 class IInputController
 {
 public:
-	virtual uint16_t GetJoy1X() { return 0; }
-	virtual uint16_t GetJoy1Y() { return 0; }
-	virtual uint16_t GetJoy2X() { return 0; }
-	virtual uint16_t GetJoy2Y() { return 0; }
+	virtual uint16_t GetJoy1X() { return UINT16_MAX / 2; }
+	virtual uint16_t GetJoy1Y() { return UINT16_MAX / 2; }
+	virtual uint16_t GetJoy2X() { return UINT16_MAX / 2; }
+	virtual uint16_t GetJoy2Y() { return UINT16_MAX / 2; }
 	virtual uint16_t GetTriggerL() { return 0; }
 	virtual uint16_t GetTriggerR() { return 0; }
 
@@ -43,19 +36,108 @@ public:
 	virtual bool GetButton6() { return false; }
 	virtual bool GetButton7() { return false; }
 
-public://Interface controls, should return one of the existing buttons.
+	virtual bool GetButton8() { return false; }
+	virtual bool GetButton9() { return false; }
+
+public:
+	// General interface controls, should return one of the existing buttons.
 	virtual bool GetButtonAccept() { return false; }
 	virtual bool GetButtonReject() { return false; }
 	virtual bool GetButtonHome() { return false; }
 
 };
 
+// Virtual dispatcher, for use in composition.
 class IDispatcher {
 public:
-	virtual void OnDataUpdated();
-	virtual void OnStateChanged(const bool connected);
+	virtual void OnDataUpdated() {}
+	virtual void OnStateChanged(const bool connected) {}
 };
 
+
+// Axis parser.
+template<typename T,
+	typename OutT,
+	const T Min,
+	const T Max,
+	const T DeadZoneRange,
+	const OutT OutBottom,
+	const OutT OutTop>
+	class AxisLinear
+{
+private:
+
+public:
+	OutT Parse(const T value)
+	{
+		const T ValueClipped = constrain(value, Min, Max);
+
+		if (ValueClipped < DeadZoneRange)
+		{
+			return OutBottom;
+		}
+		else
+		{
+			return map(ValueClipped, DeadZoneRange, Max, OutBottom, OutTop);
+		}
+	}
+};
+
+
+// Joystick parser.
+template<typename T,
+	typename OutT,
+	const T Min,
+	const T Max,
+	const int8_t Offset,
+	const T DeadZoneRange,
+	const OutT OutBottom,
+	const OutT OutTop>
+	class AxisCentered
+{
+private:
+	const T Mid = ((Max + Min) / 2) - min((int32_t)Offset, (int32_t)((Max + Min) / 2) - 1);
+	const T MidUpper = Mid + DeadZoneRange;
+	const T MidLower = Mid - DeadZoneRange;
+	const OutT OutCenter = ((OutTop + OutBottom) / 2);
+
+	T ValueClipped = 0;
+
+public:
+	T GetCenter()
+	{
+		return Mid;
+	}
+	OutT Parse(const T value)
+	{
+		ValueClipped = constrain(value, Min, Max);
+
+		if (ValueClipped >= Mid)
+		{
+			if (ValueClipped < MidUpper)
+			{
+				return OutCenter;
+			}
+			else
+			{
+				return OutCenter + (((ValueClipped - MidUpper) * (OutTop - OutCenter)) / (Max - MidUpper));
+			}
+		}
+		else
+		{
+			if (ValueClipped > MidLower)
+			{
+				return OutCenter;
+			}
+			else
+			{
+				return OutCenter - (((MidLower - ValueClipped) * (OutCenter - OutBottom)) / (MidLower - Min));
+			}
+		}
+	}
+};
+
+// Button parser.
 class ButtonPress
 {
 private:
@@ -78,6 +160,7 @@ public:
 	}
 };
 
+// Timed button parser.
 class TimedButtonPress
 {
 private:
@@ -98,9 +181,8 @@ public:
 		{
 			Time = millis();
 			Up = true;
+			return false;
 		}
-
-		return false;
 	}
 
 	uint32_t GetDurationMillis()
@@ -109,6 +191,7 @@ public:
 	}
 };
 
+// Hold button parser.
 template<const uint32_t MinDurationMillis>
 class MinTimedButtonPress
 {
@@ -130,9 +213,8 @@ public:
 		{
 			Time = millis();
 			Up = true;
+			return false;
 		}
-
-		return false;
 	}
 
 	uint32_t GetDurationMillis()
@@ -140,6 +222,4 @@ public:
 		return Time;
 	}
 };
-
 #endif
-
