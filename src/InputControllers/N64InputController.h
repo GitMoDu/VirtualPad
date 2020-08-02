@@ -99,7 +99,7 @@ public:
 		}
 		else
 		{
-			return value;
+			return Mid;
 		}
 	}
 
@@ -114,7 +114,7 @@ public:
 		}
 		else
 		{
-			return value;
+			return Mid;
 		}
 	}
 
