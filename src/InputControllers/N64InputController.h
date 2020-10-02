@@ -95,11 +95,11 @@ public:
 			&&
 			(value < (Mid + Calibration::JoyDeadZoneRadius)))
 		{
-			return value;
+			return Mid;
 		}
 		else
 		{
-			return Mid;
+			return value;
 		}
 	}
 
@@ -110,11 +110,11 @@ public:
 			&&
 			(value < (Mid + Calibration::JoyDeadZoneRadius)))
 		{
-			return value;
+			return Mid;
 		}
 		else
 		{
-			return Mid;
+			return value;
 		}
 	}
 
