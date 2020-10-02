@@ -28,6 +28,11 @@ public:
 		Connected = false;
 	}
 
+	bool IsConnected()
+	{
+		return Connected;
+	}
+
 	virtual void OnDisable()
 	{
 		Connected = false;
