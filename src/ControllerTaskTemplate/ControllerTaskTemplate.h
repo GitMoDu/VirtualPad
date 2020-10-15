@@ -16,10 +16,6 @@ protected:
 
 	IDispatcher* Dispatcher = nullptr;
 
-protected:
-	virtual void OnDataUpdated() {}
-	virtual void OnStateChanged(const bool) {}
-
 public:
 	ControllerTaskTemplate(Scheduler* scheduler)
 		: Task(UpdatePeriodMillis, TASK_FOREVER, scheduler, false)
@@ -40,8 +36,6 @@ public:
 #ifdef DEBUG_IINPUT_CONTROLLER
 		Serial.println(F("Controller disabled."));
 #endif
-
-		OnStateChanged(false);
 		if (Dispatcher != nullptr)
 		{
 			Dispatcher->OnStateChanged(false);
@@ -64,7 +58,6 @@ public:
 	{
 		if (Connected)
 		{
-			OnStateChanged(false);
 			if (Dispatcher != nullptr)
 			{
 				Dispatcher->OnStateChanged(true);
@@ -83,7 +76,6 @@ public:
 	{
 		Dispatcher = dispatcher;
 	}
-
 
 protected:
 	void Enable()
@@ -109,8 +101,6 @@ protected:
 #ifdef DEBUG_IINPUT_CONTROLLER
 			Serial.println(F("Controller plugged in"));
 #endif
-
-			OnStateChanged(true);
 			if (Dispatcher != nullptr)
 			{
 				Dispatcher->OnStateChanged(true);
@@ -118,7 +108,6 @@ protected:
 		}
 		else
 		{
-			OnDataUpdated();
 			if (Dispatcher != nullptr)
 			{
 				Dispatcher->OnDataUpdated();
@@ -134,7 +123,6 @@ protected:
 #ifdef DEBUG_IINPUT_CONTROLLER
 			Serial.println(F("Error reading controller"));
 #endif
-			OnStateChanged(false);
 			if (Dispatcher != nullptr)
 			{
 				Dispatcher->OnStateChanged(false);
@@ -143,4 +131,3 @@ protected:
 	}
 };
 #endif
-
