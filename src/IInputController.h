@@ -96,7 +96,7 @@ template<typename T,
 	class AxisCentered
 {
 private:
-	const T Mid = ((Max + Min) / 2) - min((int32_t)Offset, (int32_t)((Max + Min) / 2) - 1);
+	const T Mid = ((Max + Min) / 2) - Offset;
 	const T MidUpper = Mid + DeadZoneRange;
 	const T MidLower = Mid - DeadZoneRange;
 	const OutT OutCenter = ((OutTop + OutBottom) / 2);
