@@ -16,7 +16,7 @@
 template<
 	typename Calibration,
 	const uint8_t Pin,
-	const uint32_t UpdatePeriodMillis = 3>
+	const uint32_t UpdatePeriodMillis = 15>
 	class GamecubeControllerTask : public ControllerTaskTemplate<UpdatePeriodMillis>
 {
 private:
