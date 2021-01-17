@@ -38,6 +38,12 @@ private:
 	using BaseClass::OnControllerReadOk;
 	using BaseClass::OnControllerFail;
 
+	enum PollStateEnum
+	{
+		Polling,
+		Reading
+	} PollState = PollStateEnum::Polling;
+
 
 public:
 	N64ControllerTask(Scheduler* scheduler, HardwareSerial* serial)
@@ -52,6 +58,7 @@ public:
 	{
 		Controller.Start();
 		BaseClass::StartController();
+		PollState = PollStateEnum::Polling;
 	}
 
 	virtual void StopController()
@@ -172,20 +179,34 @@ public:
 	virtual bool GetButtonReject() { return GetButton1(); }
 	virtual bool GetButtonHome() { return GetButton7(); }
 
-protected:
+public:
 	bool Callback()
 	{
-		if (Controller.Read())
+		switch (PollState)
 		{
-			OnControllerReadOk();
-		}
-		else
-		{
-			OnControllerFail();
-		}
+		case PollStateEnum::Polling:
+			Controller.Poll();
+			PollState = PollStateEnum::Reading;
+			Task::delay(1);
+			break;
 
-		Controller.Poll();
-
+		case PollStateEnum::Reading:
+			if (Controller.Read())
+			{
+				OnControllerReadOk();
+			}
+			else
+			{
+				OnControllerFail();
+			}
+			PollState = PollStateEnum::Polling;
+			Task::delay(UpdatePeriodMillis - 1);
+			break;
+		default:
+			PollState = PollStateEnum::Polling;
+			Task::forceNextIteration();
+			break;
+		}
 
 		return true;
 	}
