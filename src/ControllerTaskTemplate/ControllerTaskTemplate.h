@@ -9,7 +9,7 @@
 #include <IInputController.h>
 
 template<const uint32_t UpdatePeriodMillis = 20>
-	class ControllerTaskTemplate : protected Task, public virtual IInputController
+class ControllerTaskTemplate : protected Task, public virtual IInputController
 {
 protected:
 	bool Connected = false;
@@ -49,12 +49,12 @@ public:
 		return true;
 	}
 
-	void StartController()
+	virtual void StartController()
 	{
 		Task::enableIfNot();
 	}
 
-	void StopController()
+	virtual void StopController()
 	{
 		if (Connected)
 		{
