@@ -7,7 +7,8 @@
 #include <ControllerTaskTemplateInclude.h>
 
 // https://github.com/GitMoDu/NintendoControllerReader
-#include <BitBangN64Controller.h>
+#include <SerialJoyBusN64Controller.h>
+
 
 
 template<
@@ -27,22 +28,36 @@ private:
 	AxisCentered<int8_t, uint16_t, Calibration::JoyYMin, Calibration::JoyYMax, Calibration::JoyYOffset, Calibration::JoyDeadZoneRadius, 0, UINT16_MAX> AxisJoy1Y;
 
 	// Controller reader.
-	BitBangN64Controller Controller;
+	SerialJoyBusN64Controller Controller;
 
 	//Template members for use in this class.
-	using ControllerTaskTemplate<UpdatePeriodMillis>::Delay;
-	using ControllerTaskTemplate<UpdatePeriodMillis>::Enable;
-	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerReadOk;
-	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerFail;
+	using BaseClass = ControllerTaskTemplate<UpdatePeriodMillis>;
+
+	using BaseClass::Delay;
+	using BaseClass::Enable;
+	using BaseClass::OnControllerReadOk;
+	using BaseClass::OnControllerFail;
 
 
 public:
-	N64ControllerTask(Scheduler* scheduler)
+	N64ControllerTask(Scheduler* scheduler, HardwareSerial* serial)
 		: ControllerTaskTemplate<UpdatePeriodMillis>(scheduler)
-		, Controller(Pin)
+		, Controller(serial)
 	{
 		Controller.Data.JoystickX = AxisJoy1X.GetCenter();
 		Controller.Data.JoystickY = AxisJoy1Y.GetCenter();
+	}
+
+	virtual void StartController()
+	{
+		Controller.Start();
+		BaseClass::StartController();
+	}
+
+	virtual void StopController()
+	{
+		BaseClass::StopController();
+		Controller.Stop();
 	}
 
 	virtual void GetDirection(bool& left, bool& right, bool& up, bool& down)
@@ -160,7 +175,7 @@ public:
 protected:
 	bool Callback()
 	{
-		if (Controller.Poll())
+		if (Controller.Read())
 		{
 			OnControllerReadOk();
 		}
@@ -168,6 +183,9 @@ protected:
 		{
 			OnControllerFail();
 		}
+
+		Controller.Poll();
+
 
 		return true;
 	}
