@@ -5,7 +5,9 @@
 
 
 #include <ControllerTaskTemplateInclude.h>
-#include <NintendoControllerReaderSTM32.h>
+
+// https://github.com/GitMoDu/NintendoControllerReader
+#include <BitBangGCController.h>
 
 
 // With an official controller attached, there is a typical interval of about 6ms between successive updates.
@@ -18,6 +20,8 @@ template<
 	class GamecubeControllerTask : public ControllerTaskTemplate<UpdatePeriodMillis>
 {
 private:
+	using GamecubeButtons = GameCube::Buttons;
+
 	static const uint16_t Mid = (UINT16_MAX / 2);
 
 	// Template calibrations.
@@ -31,7 +35,7 @@ private:
 	AxisLinear<uint8_t, uint16_t, Calibration::TriggerRMin, Calibration::TriggerRMax, Calibration::TriggerRDeadZone, 0, UINT16_MAX> AxisTriggerR;
 
 	// Controller reader.
-	GameCubeController Controller;
+	BitBangGCController Controller;
 
 	//Template members for use in this class.
 	using ControllerTaskTemplate<UpdatePeriodMillis>::Delay;
@@ -39,30 +43,27 @@ private:
 	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerReadOk;
 	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerFail;
 
-	using GamecubeButtons = GameCubeController::GamecubeButtons;
-
-	GameCubeData_t RawData;
 
 public:
 	GamecubeControllerTask(Scheduler* scheduler)
 		: ControllerTaskTemplate<UpdatePeriodMillis>(scheduler)
 		, Controller(Pin)
 	{
-		RawData.JoystickX = AxisJoy1X.GetCenter();
-		RawData.JoystickY = AxisJoy1Y.GetCenter();
+		Controller.Data.JoystickX = AxisJoy1X.GetCenter();
+		Controller.Data.JoystickY = AxisJoy1Y.GetCenter();
 	}
 
 	virtual void GetDirection(bool& left, bool& right, bool& up, bool& down)
 	{
-		left = RawData.Buttons & (1 << GamecubeButtons::Left);
-		right = RawData.Buttons & (1 << GamecubeButtons::Right);
-		up = RawData.Buttons & (1 << GamecubeButtons::Up);
-		down = RawData.Buttons & (1 << GamecubeButtons::Down);
+		left = Controller.Data.Buttons & (1 << GamecubeButtons::Left);
+		right = Controller.Data.Buttons & (1 << GamecubeButtons::Right);
+		up = Controller.Data.Buttons & (1 << GamecubeButtons::Up);
+		down = Controller.Data.Buttons & (1 << GamecubeButtons::Down);
 	}
 
 	virtual uint16_t GetJoy1X()
 	{
-		uint16_t value = AxisJoy1X.Parse(RawData.JoystickX);
+		uint16_t value = AxisJoy1X.Parse(Controller.Data.JoystickX);
 
 		if ((value > (Mid - Calibration::JoyDeadZoneRadius))
 			&&
@@ -78,7 +79,7 @@ public:
 
 	virtual uint16_t GetJoy1Y()
 	{
-		uint16_t value = AxisJoy1Y.Parse(RawData.JoystickY);
+		uint16_t value = AxisJoy1Y.Parse(Controller.Data.JoystickY);
 		if ((value > (Mid - Calibration::JoyDeadZoneRadius))
 			&&
 			(value < (Mid + Calibration::JoyDeadZoneRadius)))
@@ -94,7 +95,7 @@ public:
 
 	virtual uint16_t GetJoy2X()
 	{
-		uint16_t value = AxisJoy2X.Parse(RawData.JoystickCX);
+		uint16_t value = AxisJoy2X.Parse(Controller.Data.JoystickCX);
 		if ((value > (Mid - Calibration::JoyCDeadZoneRadius))
 			&&
 			(value < (Mid + Calibration::JoyCDeadZoneRadius)))
@@ -109,7 +110,7 @@ public:
 
 	virtual uint16_t GetJoy2Y()
 	{
-		uint16_t value = AxisJoy2Y.Parse(RawData.JoystickCY);
+		uint16_t value = AxisJoy2Y.Parse(Controller.Data.JoystickCY);
 		if ((value > (Mid - Calibration::JoyCDeadZoneRadius))
 			&&
 			(value < (Mid + Calibration::JoyCDeadZoneRadius)))
@@ -124,7 +125,7 @@ public:
 
 	virtual uint16_t GetTriggerL()
 	{
-		uint16_t value = AxisTriggerL.Parse(RawData.SliderLeft);
+		uint16_t value = AxisTriggerL.Parse(Controller.Data.SliderLeft);
 		if (value > Calibration::TriggerLDeadZone)
 		{
 			return value;
@@ -137,7 +138,7 @@ public:
 
 	virtual uint16_t GetTriggerR()
 	{
-		uint16_t value = AxisTriggerR.Parse(RawData.SliderRight);
+		uint16_t value = AxisTriggerR.Parse(Controller.Data.SliderRight);
 		if (value > Calibration::TriggerRDeadZone)
 		{
 			return value;
@@ -148,19 +149,19 @@ public:
 		}
 	}
 
-	virtual bool GetLeft() { return  RawData.Buttons & (1 << GamecubeButtons::Left); }
-	virtual bool GetRight() { return  RawData.Buttons & (1 << GamecubeButtons::Right); }
-	virtual bool GetUp() { return RawData.Buttons & (1 << GamecubeButtons::Up); }
-	virtual bool GetDown() { return RawData.Buttons & (1 << GamecubeButtons::Down); }
+	virtual bool GetLeft() { return  Controller.Data.Buttons & (1 << GamecubeButtons::Left); }
+	virtual bool GetRight() { return  Controller.Data.Buttons & (1 << GamecubeButtons::Right); }
+	virtual bool GetUp() { return Controller.Data.Buttons & (1 << GamecubeButtons::Up); }
+	virtual bool GetDown() { return Controller.Data.Buttons & (1 << GamecubeButtons::Down); }
 
-	virtual bool GetButton0() { return RawData.Buttons & (1 << GamecubeButtons::A); }
-	virtual bool GetButton1() { return RawData.Buttons & (1 << GamecubeButtons::B); }
-	virtual bool GetButton2() { return RawData.Buttons & (1 << GamecubeButtons::X); }
-	virtual bool GetButton3() { return RawData.Buttons & (1 << GamecubeButtons::Y); }
-	virtual bool GetButton4() { return RawData.Buttons & (1 << GamecubeButtons::Z); }
-	virtual bool GetButton5() { return RawData.Buttons & (1 << GamecubeButtons::L); }
-	virtual bool GetButton6() { return RawData.Buttons & (1 << GamecubeButtons::R); }
-	virtual bool GetButton7() { return RawData.Buttons & (1 << GamecubeButtons::Start); }
+	virtual bool GetButton0() { return Controller.Data.Buttons & (1 << GamecubeButtons::A); }
+	virtual bool GetButton1() { return Controller.Data.Buttons & (1 << GamecubeButtons::B); }
+	virtual bool GetButton2() { return Controller.Data.Buttons & (1 << GamecubeButtons::X); }
+	virtual bool GetButton3() { return Controller.Data.Buttons & (1 << GamecubeButtons::Y); }
+	virtual bool GetButton4() { return Controller.Data.Buttons & (1 << GamecubeButtons::Z); }
+	virtual bool GetButton5() { return Controller.Data.Buttons & (1 << GamecubeButtons::L); }
+	virtual bool GetButton6() { return Controller.Data.Buttons & (1 << GamecubeButtons::R); }
+	virtual bool GetButton7() { return Controller.Data.Buttons & (1 << GamecubeButtons::Start); }
 
 	// Interface controls redirection.
 	virtual bool GetButtonAccept() { return GetButton0(); }
@@ -171,7 +172,7 @@ public:
 protected:
 	bool Callback()
 	{
-		if (Controller.Read(&RawData))
+		if (Controller.Poll())
 		{
 			OnControllerReadOk();
 		}
@@ -183,21 +184,6 @@ protected:
 
 		return true;
 	}
-
-	void StopForceFeedback()
-	{
-		// Send command to stop rumble.
-		Controller.ReadWithRumble(&RawData, false);
-	}
-
-#ifdef DEBUG_IINPUT_CONTROLLER
-public:
-	GameCubeData_t* GetRawData()
-	{
-		return &RawData;
-	}
-
-#endif
 };
 
 #endif

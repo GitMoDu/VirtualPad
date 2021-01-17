@@ -6,8 +6,8 @@
 
 #include <ControllerTaskTemplateInclude.h>
 
-// https://github.com/GitMoDu/NintendoControllerReaderSTM32
-#include <NintendoControllerReaderSTM32.h>
+// https://github.com/GitMoDu/NintendoControllerReader
+#include <BitBangN64Controller.h>
 
 
 template<
@@ -17,6 +17,9 @@ template<
 	class N64ControllerTask : public ControllerTaskTemplate<UpdatePeriodMillis>
 {
 private:
+	// Short hand for buttons enumerator.
+	using Buttons = Nintendo64::Buttons;
+
 	static const uint16_t Mid = (UINT16_MAX / 2);
 
 	// Template calibrations.
@@ -24,10 +27,7 @@ private:
 	AxisCentered<int8_t, uint16_t, Calibration::JoyYMin, Calibration::JoyYMax, Calibration::JoyYOffset, Calibration::JoyDeadZoneRadius, 0, UINT16_MAX> AxisJoy1Y;
 
 	// Controller reader.
-	N64Controller Controller;
-
-	// Raw controller data.
-	N64Data_t RawData;
+	BitBangN64Controller Controller;
 
 	//Template members for use in this class.
 	using ControllerTaskTemplate<UpdatePeriodMillis>::Delay;
@@ -35,33 +35,31 @@ private:
 	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerReadOk;
 	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerFail;
 
-	// Short hand for buttons enumerator.
-	using N64Buttons = N64Controller::N64Buttons;
 
 public:
 	N64ControllerTask(Scheduler* scheduler)
 		: ControllerTaskTemplate<UpdatePeriodMillis>(scheduler)
 		, Controller(Pin)
 	{
-		RawData.JoystickX = AxisJoy1X.GetCenter();
-		RawData.JoystickY = AxisJoy1Y.GetCenter();
+		Controller.Data.JoystickX = AxisJoy1X.GetCenter();
+		Controller.Data.JoystickY = AxisJoy1Y.GetCenter();
 	}
 
 	virtual void GetDirection(bool& left, bool& right, bool& up, bool& down)
 	{
-		left = RawData.Buttons & (1 << N64Buttons::Left);
-		right = RawData.Buttons & (1 << N64Buttons::Right);
-		up = RawData.Buttons & (1 << N64Buttons::Up);
-		down = RawData.Buttons & (1 << N64Buttons::Down);
+		left = Controller.Data.Buttons & (1 << Buttons::Left);
+		right = Controller.Data.Buttons & (1 << Buttons::Right);
+		up = Controller.Data.Buttons & (1 << Buttons::Up);
+		down = Controller.Data.Buttons & (1 << Buttons::Down);
 	}
 
 	virtual uint16_t GetJoy2X()
 	{
-		if ((RawData.Buttons & (1 << N64Buttons::CLeft)) && !(RawData.Buttons & (1 << N64Buttons::CRight)))
+		if ((Controller.Data.Buttons & (1 << Buttons::CLeft)) && !(Controller.Data.Buttons & (1 << Buttons::CRight)))
 		{
 			return 0;
 		}
-		else if ((RawData.Buttons & (1 << N64Buttons::CRight)) && !(RawData.Buttons & (1 << N64Buttons::CLeft)))
+		else if ((Controller.Data.Buttons & (1 << Buttons::CRight)) && !(Controller.Data.Buttons & (1 << Buttons::CLeft)))
 		{
 			return UINT16_MAX;
 		}
@@ -73,11 +71,11 @@ public:
 
 	virtual uint16_t GetJoy2Y()
 	{
-		if ((RawData.Buttons & (1 << N64Buttons::CDown)) && !(RawData.Buttons & (1 << N64Buttons::CUp)))
+		if ((Controller.Data.Buttons & (1 << Buttons::CDown)) && !(Controller.Data.Buttons & (1 << Buttons::CUp)))
 		{
 			return 0;
 		}
-		else if ((RawData.Buttons & (1 << N64Buttons::CUp)) && !(RawData.Buttons & (1 << N64Buttons::CDown)))
+		else if ((Controller.Data.Buttons & (1 << Buttons::CUp)) && !(Controller.Data.Buttons & (1 << Buttons::CDown)))
 		{
 			return UINT16_MAX;
 		}
@@ -89,7 +87,7 @@ public:
 
 	virtual uint16_t GetJoy1X()
 	{
-		uint16_t value = AxisJoy1X.Parse(RawData.JoystickX);
+		uint16_t value = AxisJoy1X.Parse(Controller.Data.JoystickX);
 
 		if ((value > (Mid - Calibration::JoyDeadZoneRadius))
 			&&
@@ -105,7 +103,7 @@ public:
 
 	virtual uint16_t GetJoy1Y()
 	{
-		uint16_t value = AxisJoy1Y.Parse(RawData.JoystickY);
+		uint16_t value = AxisJoy1Y.Parse(Controller.Data.JoystickY);
 		if ((value > (Mid - Calibration::JoyDeadZoneRadius))
 			&&
 			(value < (Mid + Calibration::JoyDeadZoneRadius)))
@@ -120,7 +118,7 @@ public:
 
 	virtual uint16_t GetTriggerL()
 	{
-		if (RawData.Buttons & (1 << N64Buttons::L))
+		if (Controller.Data.Buttons & (1 << Buttons::L))
 		{
 			return UINT16_MAX;
 		}
@@ -132,7 +130,7 @@ public:
 
 	virtual uint16_t GetTriggerR()
 	{
-		if (RawData.Buttons & (1 << N64Buttons::R))
+		if (Controller.Data.Buttons & (1 << Buttons::R))
 		{
 			return UINT16_MAX;
 		}
@@ -142,17 +140,17 @@ public:
 		}
 	}
 
-	virtual bool GetLeft() { return  RawData.Buttons & (1 << N64Buttons::Left); }
-	virtual bool GetRight() { return  RawData.Buttons & (1 << N64Buttons::Right); }
-	virtual bool GetUp() { return RawData.Buttons & (1 << N64Buttons::Up); }
-	virtual bool GetDown() { return RawData.Buttons & (1 << N64Buttons::Down); }
+	virtual bool GetLeft() { return  Controller.Data.Buttons & (1 << Buttons::Left); }
+	virtual bool GetRight() { return  Controller.Data.Buttons & (1 << Buttons::Right); }
+	virtual bool GetUp() { return Controller.Data.Buttons & (1 << Buttons::Up); }
+	virtual bool GetDown() { return Controller.Data.Buttons & (1 << Buttons::Down); }
 
-	virtual bool GetButton0() { return RawData.Buttons & (1 << N64Buttons::A); }
-	virtual bool GetButton1() { return RawData.Buttons & (1 << N64Buttons::B); }
-	virtual bool GetButton4() { return RawData.Buttons & (1 << N64Buttons::Z); }
-	virtual bool GetButton5() { return RawData.Buttons & (1 << N64Buttons::L); }
-	virtual bool GetButton6() { return RawData.Buttons & (1 << N64Buttons::R); }
-	virtual bool GetButton7() { return RawData.Buttons & (1 << N64Buttons::Start); }
+	virtual bool GetButton0() { return Controller.Data.Buttons & (1 << Buttons::A); }
+	virtual bool GetButton1() { return Controller.Data.Buttons & (1 << Buttons::B); }
+	virtual bool GetButton4() { return Controller.Data.Buttons & (1 << Buttons::Z); }
+	virtual bool GetButton5() { return Controller.Data.Buttons & (1 << Buttons::L); }
+	virtual bool GetButton6() { return Controller.Data.Buttons & (1 << Buttons::R); }
+	virtual bool GetButton7() { return Controller.Data.Buttons & (1 << Buttons::Start); }
 
 	// Interface controls redirection.
 	virtual bool GetButtonAccept() { return GetButton0(); }
@@ -162,7 +160,7 @@ public:
 protected:
 	bool Callback()
 	{
-		if (Controller.Read(&RawData))
+		if (Controller.Poll())
 		{
 			OnControllerReadOk();
 		}
