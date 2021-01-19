@@ -109,33 +109,12 @@ public:
 
 	virtual uint16_t GetJoy1X()
 	{
-		uint16_t value = AxisJoy1X.Parse(Controller.Data.JoystickX);
-
-		if ((value > (Mid - Calibration::JoyDeadZoneRadius))
-			&&
-			(value < (Mid + Calibration::JoyDeadZoneRadius)))
-		{
-			return Mid;
-		}
-		else
-		{
-			return value;
-		}
+		return AxisJoy1X.Parse(Controller.Data.JoystickX);
 	}
 
 	virtual uint16_t GetJoy1Y()
 	{
-		uint16_t value = AxisJoy1Y.Parse(Controller.Data.JoystickY);
-		if ((value > (Mid - Calibration::JoyDeadZoneRadius))
-			&&
-			(value < (Mid + Calibration::JoyDeadZoneRadius)))
-		{
-			return Mid;
-		}
-		else
-		{
-			return value;
-		}
+		return AxisJoy1Y.Parse(Controller.Data.JoystickY);
 	}
 
 	virtual uint16_t GetTriggerL()
