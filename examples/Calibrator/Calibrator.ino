@@ -31,29 +31,29 @@ class GamecubeControllerCalibration
 {
 public:
 	//Joystick.
-	static const uint8_t	JoyXMin = 26;
-	static const uint8_t	JoyXMax = 231;
+	static const int8_t		JoyXMin = -103;
+	static const int8_t		JoyXMax = 103;
 	static const int8_t		JoyXOffset = -1;
 
-	static const uint8_t	JoyYMin = 30;
-	static const uint8_t	JoyYMax = 237;
-	static const int8_t		JoyYOffset = 0;
+	static const int8_t		JoyYMin = -99;
+	static const int8_t		JoyYMax = 107;
+	static const int8_t		JoyYOffset = -2;
 
-	static const uint8_t	JoyDeadZoneRadius = 9;
+	static const uint8_t	JoyDeadZoneRadius = 3;
 
 	//Joystick C.
-	static const uint8_t	JoyCXMin = 25;
-	static const uint8_t	JoyCXMax = 225;
-	static const int8_t		JoyCXOffset = 0;
+	static const int8_t		JoyCXMin = -88;
+	static const int8_t		JoyCXMax = 96;
+	static const int8_t		JoyCXOffset = 3;
 
-	static const uint8_t	JoyCYMin = 24;
-	static const uint8_t	JoyCYMax = 233;
-	static const int8_t		JoyCYOffset = 0;
+	static const int8_t		JoyCYMin = -92;
+	static const int8_t		JoyCYMax = 97;
+	static const int8_t		JoyCYOffset = -4;
 
-	static const uint8_t	JoyCDeadZoneRadius = 9;
+	static const uint8_t	JoyCDeadZoneRadius = 4;
 
 	//Trigers.
-	static const uint8_t	TriggerLMin = 30;
+	static const uint8_t	TriggerLMin = 34;
 	static const uint8_t	TriggerLMax = 180;
 	static const uint8_t	TriggerLDeadZone = 41;
 
@@ -70,8 +70,8 @@ public:
 	static const int8_t		JoyXMax = 75;
 	static const int8_t		JoyXOffset = 0;
 
-	static const uint8_t	JoyYMin = -78;
-	static const uint8_t	JoyYMax = 78;
+	static const int8_t		JoyYMin = -78;
+	static const int8_t		JoyYMax = 78;
 	static const int8_t		JoyYOffset = 0;
 
 	static const uint8_t	JoyDeadZoneRadius = 1;
