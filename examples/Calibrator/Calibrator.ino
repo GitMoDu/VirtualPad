@@ -30,11 +30,6 @@ Scheduler SchedulerBase;
 class GamecubeControllerCalibration
 {
 public:
-	static const uint8_t	GamecubeAxisRange = 255;
-	static const uint8_t	GamecubeAxisMin = 0;
-	static const uint8_t	GamecubeAxisMax = GamecubeAxisRange - 1;
-
-public:
 	//Joystick.
 	static const uint8_t	JoyXMin = 26;
 	static const uint8_t	JoyXMax = 231;
