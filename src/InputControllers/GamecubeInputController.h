@@ -7,7 +7,7 @@
 #include <ControllerTaskTemplateInclude.h>
 
 // https://github.com/GitMoDu/NintendoControllerReader
-#include <BitBangGCController.h>
+#include <SerialJoyBusGCController.h>
 
 
 // With an official controller attached, there is a typical interval of about 6ms between successive updates.
@@ -15,7 +15,6 @@
 // in http://www.int03.co.uk/crema/hardware/gamecube/gc-control.html
 template<
 	typename Calibration,
-	const uint8_t Pin,
 	const uint32_t UpdatePeriodMillis = 15>
 	class GamecubeControllerTask : public ControllerTaskTemplate<UpdatePeriodMillis>
 {
@@ -35,7 +34,7 @@ private:
 	AxisLinear<uint8_t, uint16_t, Calibration::TriggerRMin, Calibration::TriggerRMax, Calibration::TriggerRDeadZone, 0, UINT16_MAX> AxisTriggerR;
 
 	// Controller reader.
-	BitBangGCController Controller;
+	SerialJoyBusGCController Controller;
 
 	//Template members for use in this class.
 	using BaseClass = ControllerTaskTemplate<UpdatePeriodMillis>;
@@ -46,13 +45,32 @@ private:
 	using BaseClass::OnControllerReadOk;
 	using BaseClass::OnControllerFail;
 
+	enum PollStateEnum
+	{
+		Polling,
+		Reading
+	} PollState = PollStateEnum::Polling;
+
 public:
-	GamecubeControllerTask(Scheduler* scheduler)
+	GamecubeControllerTask(Scheduler* scheduler, HardwareSerial* serialInstance)
 		: ControllerTaskTemplate<UpdatePeriodMillis>(scheduler)
-		, Controller(Pin)
+		, Controller(serialInstance)
 	{
 		Controller.Data.JoystickX = AxisJoy1X.GetCenter();
 		Controller.Data.JoystickY = AxisJoy1Y.GetCenter();
+	}
+
+	virtual void StartController()
+	{
+		Controller.Start();
+		BaseClass::StartController();
+		PollState = PollStateEnum::Polling;
+	}
+
+	virtual void StopController()
+	{
+		BaseClass::StopController();
+		Controller.Stop();
 	}
 
 	virtual void GetDirection(bool& left, bool& right, bool& up, bool& down)
@@ -124,15 +142,30 @@ public:
 protected:
 	bool Callback()
 	{
-		if (Controller.Poll())
+		switch (PollState)
 		{
-			OnControllerReadOk();
+		case PollStateEnum::Polling:
+			Controller.Poll();
+			PollState = PollStateEnum::Reading;
+			Task::delay(2);
+			break;
+		case PollStateEnum::Reading:
+			if (Controller.Read())
+			{
+				OnControllerReadOk();
+			}
+			else
+			{
+				OnControllerFail();
+			}
+			PollState = PollStateEnum::Polling;
+			Task::delay(UpdatePeriodMillis - 1);
+			break;
+		default:
+			PollState = PollStateEnum::Polling;
+			Task::forceNextIteration();
+			break;
 		}
-		else
-		{
-			OnControllerFail();
-		}
-
 
 		return true;
 	}

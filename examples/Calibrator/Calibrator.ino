@@ -77,12 +77,11 @@ public:
 	static const uint8_t	JoyDeadZoneRadius = 1;
 };
 
-const uint32_t CONTROLLER_PIN = PA0;
-const uint32_t ControllerUpdatePeriodMillis = 4;
+const uint32_t ControllerUpdatePeriodMillis = 3;
 
 
-GamecubeControllerTask<GamecubeControllerCalibration, CONTROLLER_PIN, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase);
-//N64ControllerTask<N64ControllerCalibration, CONTROLLER_PIN, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase);
+GamecubeControllerTask<GamecubeControllerCalibration, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase, &Serial3);
+//N64ControllerTask<N64ControllerCalibration, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase, &Serial3);
 
 
 ///Support screen

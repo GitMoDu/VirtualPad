@@ -13,7 +13,6 @@
 
 template<
 	typename Calibration,
-	const uint8_t Pin,
 	const uint32_t UpdatePeriodMillis = 15>
 	class N64ControllerTask : public ControllerTaskTemplate<UpdatePeriodMillis>
 {
@@ -44,11 +43,10 @@ private:
 		Reading
 	} PollState = PollStateEnum::Polling;
 
-
 public:
-	N64ControllerTask(Scheduler* scheduler, HardwareSerial* serial)
+	N64ControllerTask(Scheduler* scheduler, HardwareSerial* serialInstance)
 		: ControllerTaskTemplate<UpdatePeriodMillis>(scheduler)
-		, Controller(serial)
+		, Controller(serialInstance)
 	{
 		Controller.Data.JoystickX = AxisJoy1X.GetCenter();
 		Controller.Data.JoystickY = AxisJoy1Y.GetCenter();
