@@ -120,7 +120,7 @@ void setup()
 #ifdef DEBUG_LOG
 		Serial.println(F("SupportScreen Setup Failed."));
 #endif
-		//Halt();
+		Halt();
 	}
 #ifdef DEBUG_LOG
 	else
