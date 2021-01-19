@@ -38,11 +38,13 @@ private:
 	BitBangGCController Controller;
 
 	//Template members for use in this class.
-	using ControllerTaskTemplate<UpdatePeriodMillis>::Delay;
-	using ControllerTaskTemplate<UpdatePeriodMillis>::Enable;
-	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerReadOk;
-	using ControllerTaskTemplate<UpdatePeriodMillis>::OnControllerFail;
+	using BaseClass = ControllerTaskTemplate<UpdatePeriodMillis>;
 
+	//Template members for use in this class.
+	using BaseClass::Delay;
+	using BaseClass::Enable;
+	using BaseClass::OnControllerReadOk;
+	using BaseClass::OnControllerFail;
 
 public:
 	GamecubeControllerTask(Scheduler* scheduler)
