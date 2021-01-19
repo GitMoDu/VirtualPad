@@ -48,8 +48,7 @@
 #include <IInputController.h>
 
 template<
-	const uint8_t SPI_Index,
-	typename Calibration>
+	const uint8_t SPI_Index>
 	class ProcessSupportScreen : Task
 {
 private:

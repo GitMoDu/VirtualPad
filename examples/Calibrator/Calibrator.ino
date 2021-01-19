@@ -86,7 +86,7 @@ GamecubeControllerTask<GamecubeControllerCalibration, ControllerUpdatePeriodMill
 
 ///Support screen
 #ifdef USE_SUPPORT_SCREEN
-ProcessSupportScreen<2, GamecubeControllerCalibration> SupportScreen(&SchedulerBase, &Controller);
+ProcessSupportScreen<2> SupportScreen(&SchedulerBase, &Controller);
 #endif
 ///
 
