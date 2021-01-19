@@ -197,11 +197,6 @@ public:
 			}
 			else
 			{
-				// Reset controller values.
-				Controller.Data.Buttons = 0;
-				Controller.Data.JoystickX = 0;
-				Controller.Data.JoystickY = 0;
-
 				OnControllerFail();
 			}
 			PollState = PollStateEnum::Polling;
