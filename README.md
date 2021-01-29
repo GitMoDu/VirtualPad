@@ -9,4 +9,4 @@ Task Scheduler - https://github.com/arkhipenko/TaskScheduler
 # Controller Implementation Dependencies
 GameCube and N64 controller tasks provided and tested working on Arduino STM32 ( https://github.com/rogerclarkmelbourne/Arduino_STM32)
 
-Nintendo Controler Reader - https://github.com/GitMoDu/NintendoControllerReaderSTM32
+Nintendo Controler Reader - https://github.com/GitMoDu/NintendoControllerReader
