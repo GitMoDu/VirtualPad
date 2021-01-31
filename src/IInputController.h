@@ -3,6 +3,7 @@
 #ifndef _I_INPUT_CONTROLLER_h
 #define _I_INPUT_CONTROLLER_h
 
+#include <stdint.h>
 
 // Virtual controller interface.
 class IInputController
