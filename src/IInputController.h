@@ -64,24 +64,32 @@ template<typename T,
 	const OutT OutTop>
 	class AxisLinear
 {
-private:
-
 public:
 	OutT Parse(const T value)
 	{
-		const T ValueClipped = constrain(value, Min, Max);
+		// Clip input to min/max.
+		T ValueClipped = value;
 
+		if (value >= Max)
+		{
+			ValueClipped = Max;
+		}
+		else if (value < Min)
+		{
+			ValueClipped = Min;
+		}
+
+		// Deadzone low region.
 		if (ValueClipped < DeadZoneRange)
 		{
 			return OutBottom;
 		}
 		else
 		{
-			return map(ValueClipped, DeadZoneRange, Max, OutBottom, OutTop);
+			return ((ValueClipped - DeadZoneRange) * (OutTop - OutBottom)) / (Max - DeadZoneRange);
 		}
 	}
 };
-
 
 // Joystick parser.
 template<typename T,
@@ -100,17 +108,27 @@ private:
 	const T MidLower = Mid - DeadZoneRange;
 	const OutT OutCenter = ((OutTop + OutBottom) / 2);
 
-	T ValueClipped = 0;
-
 public:
 	T GetCenter()
 	{
 		return Mid;
 	}
+
 	OutT Parse(const T value)
 	{
-		ValueClipped = constrain(value, Min, Max);
+		// Clip input to min/max.
+		T ValueClipped = value;
 
+		if (value >= Max)
+		{
+			ValueClipped = Max;
+		}
+		else if (value < Min)
+		{
+			ValueClipped = Min;
+		}
+
+		// Deadzone center region. Only works well for small values (< 5).
 		if (ValueClipped >= Mid)
 		{
 			if (ValueClipped < MidUpper)
