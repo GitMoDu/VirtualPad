@@ -36,16 +36,14 @@ public:
 	virtual bool GetButton5() { return false; }
 	virtual bool GetButton6() { return false; }
 	virtual bool GetButton7() { return false; }
-
 	virtual bool GetButton8() { return false; }
 	virtual bool GetButton9() { return false; }
 
 public:
 	// General interface controls, should return one of the existing buttons.
-	virtual bool GetButtonAccept() { return false; }
-	virtual bool GetButtonReject() { return false; }
+	virtual bool GetButtonAccept() { return GetButton0(); }
+	virtual bool GetButtonReject() { return GetButton1(); }
 	virtual bool GetButtonHome() { return false; }
-
 };
 
 // Virtual dispatcher, for use in composition.
