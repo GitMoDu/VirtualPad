@@ -33,18 +33,18 @@ public:
 	//Joystick.
 	static const int8_t		JoyXMin = -103;
 	static const int8_t		JoyXMax = 103;
-	static const int8_t		JoyXOffset = -1;
+	static const int8_t		JoyXOffset = 0;
 
 	static const int8_t		JoyYMin = -99;
 	static const int8_t		JoyYMax = 107;
-	static const int8_t		JoyYOffset = -2;
+	static const int8_t		JoyYOffset = -1;
 
-	static const uint8_t	JoyDeadZoneRadius = 3;
+	static const uint8_t	JoyDeadZoneRadius = 4;
 
 	//Joystick C.
 	static const int8_t		JoyCXMin = -88;
 	static const int8_t		JoyCXMax = 96;
-	static const int8_t		JoyCXOffset = 3;
+	static const int8_t		JoyCXOffset = 5;
 
 	static const int8_t		JoyCYMin = -92;
 	static const int8_t		JoyCYMax = 97;
@@ -80,7 +80,7 @@ public:
 const uint32_t ControllerUpdatePeriodMillis = 3;
 
 
-GamecubeControllerTask<GamecubeControllerCalibration, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase, &Serial3);
+GamecubeInputController<GamecubeControllerCalibration, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase, &Serial3);
 //N64ControllerTask<N64ControllerCalibration, ControllerUpdatePeriodMillis>  Controller(&SchedulerBase, &Serial3);
 
 
