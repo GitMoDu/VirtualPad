@@ -9,19 +9,13 @@
 // https://github.com/GitMoDu/NintendoControllerReader
 #include <SerialJoyBusGCController.h>
 
-
-// With an official controller attached, there is a typical interval of about 6ms between successive updates.
-// Each update lasts around 348us.
-// in http://www.int03.co.uk/crema/hardware/gamecube/gc-control.html
 template<
 	typename Calibration,
 	const uint32_t UpdatePeriodMillis = 15>
-	class GamecubeControllerTask : public ControllerTaskTemplate<UpdatePeriodMillis>
+	class GamecubeInputController : public ControllerTaskTemplate<UpdatePeriodMillis>
 {
-private:
+protected:
 	using GamecubeButtons = GameCube::Buttons;
-
-	static const uint16_t Mid = (UINT16_MAX / 2);
 
 	// Template calibrations.
 	AxisCentered<int8_t, uint16_t, Calibration::JoyXMin, Calibration::JoyXMax, Calibration::JoyXOffset, Calibration::JoyDeadZoneRadius, 0, UINT16_MAX> AxisJoy1X;
@@ -52,7 +46,7 @@ private:
 	} PollState = PollStateEnum::Polling;
 
 public:
-	GamecubeControllerTask(Scheduler* scheduler, HardwareSerial* serialInstance)
+	GamecubeInputController(Scheduler* scheduler, HardwareSerial* serialInstance)
 		: ControllerTaskTemplate<UpdatePeriodMillis>(scheduler)
 		, Controller(serialInstance)
 	{
@@ -138,6 +132,9 @@ public:
 	virtual bool GetButtonReject() { return GetButton1(); }
 	virtual bool GetButtonHome() { return GetButton7(); }
 
+protected:
+	virtual void OnValuesUpdated() {}
+
 
 protected:
 	bool Callback()
@@ -152,6 +149,7 @@ protected:
 		case PollStateEnum::Reading:
 			if (Controller.Read())
 			{
+				OnValuesUpdated();
 				OnControllerReadOk();
 			}
 			else
@@ -170,6 +168,4 @@ protected:
 		return true;
 	}
 };
-
 #endif
-
