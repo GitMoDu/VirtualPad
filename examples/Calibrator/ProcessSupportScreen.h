@@ -22,9 +22,6 @@
 #include <RendererSSD13XX.h>
 
 
-//#define SUPPORT_SCREEN_SPI_RETRY_PERIOD 5
-//#define SUPPORT_SCREEN_BLACK_FRAME_INSERTION_ENABLE
-
 
 
 #if defined(ARDUINO_ARCH_STM32F1)
@@ -623,17 +620,8 @@ public:
 
 	uint8_t RenderPass = 0;
 	const uint8_t RenderPassCount = 4;
-	bool BlackFrame = false;
 	bool Render()
 	{
-#ifdef SUPPORT_SCREEN_BLACK_FRAME_INSERTION_ENABLE
-		if (BlackFrame)
-		{
-			BlackFrame = false;
-			Driver->ClearBuffer();
-			return true;
-}
-#endif
 		switch (RenderPass)
 		{
 		case 0:
@@ -661,10 +649,6 @@ public:
 		if (RenderPass >= RenderPassCount)
 		{
 			RenderPass = 0;
-
-#ifdef SUPPORT_SCREEN_BLACK_FRAME_INSERTION_ENABLE
-			BlackFrame = true;
-#endif
 			return true;
 		}
 		else
