@@ -3,240 +3,346 @@
 #ifndef _I_INPUT_CONTROLLER_h
 #define _I_INPUT_CONTROLLER_h
 
-#include <stdint.h>
+#include "Model/DigitalButtons.h"
+#include "Model/Features.h"
+#include "Model/controller_state.h"
+#include "ControllerParser/ButtonParser.h"
+#include "ControllerParser/AxisParser.h"
+#include "ControllerParser/JoystickParser.h"
 
-// Virtual controller interface.
+/// <summary>
+/// IInputController (read) interface.
+/// Use of button masks is slower than boolean fields, but uses way less RAM and speeds up state copies significantly.
+/// Modelled after RetroArch's RetroPad.
+///			
+/// Menu Buttons:
+/// 
+///			[Guide]
+/// [Select]		[Start]
+///			[Share] 
+///	
+/// 
+/// DPad:
+/// 
+///		[?]
+///	[?]		[?]
+///		[?]				
+/// 
+/// 
+/// Face Buttons:
+/// 
+///		[X]
+/// [Y]		[A]
+///		[B]
+/// 
+/// 
+/// Joysticks 1 and 2, with respective L3 and R3:
+/// 
+///		[?]				[?]
+///	[?]	[3] [?]		[?]	[3] [?]
+///		[?]				[?]
+/// 
+/// 
+/// Digital and Analog Triggers:
+/// 
+/// [L1]		[R1]
+/// [L2]		[R2]
+/// 
+/// </summary>
 class IInputController
 {
 public:
-	virtual uint16_t GetJoy1X() { return UINT16_MAX / 2; }
-	virtual uint16_t GetJoy1Y() { return UINT16_MAX / 2; }
-	virtual uint16_t GetJoy2X() { return UINT16_MAX / 2; }
-	virtual uint16_t GetJoy2Y() { return UINT16_MAX / 2; }
-	virtual uint16_t GetTriggerL() { return 0; }
-	virtual uint16_t GetTriggerR() { return 0; }
+	controller_state_t State{};
 
-	virtual void GetDirection(bool& left, bool& right, bool& up, bool& down)
+private:
+	const uint16_t Features;
+
+protected:
+	template<const uint8_t bitIndex>
+	static constexpr uint8_t ButtonMask()
 	{
-		left = false;
-		right = false;
-		up = false;
-		down = false;
+		return ((uint8_t)1) << ((uint8_t)bitIndex);
 	}
-	virtual bool GetLeft() { return false; }
-	virtual bool GetRight() { return false; }
-	virtual bool GetUp() { return false; }
-	virtual bool GetDown() { return false; }
 
-	virtual bool GetButton0() { return false; }
-	virtual bool GetButton1() { return false; }
-	virtual bool GetButton2() { return false; }
-	virtual bool GetButton3() { return false; }
-	virtual bool GetButton4() { return false; }
-	virtual bool GetButton5() { return false; }
-	virtual bool GetButton6() { return false; }
-	virtual bool GetButton7() { return false; }
-	virtual bool GetButton8() { return false; }
-	virtual bool GetButton9() { return false; }
-
-public:
-	// General interface controls, should return one of the existing buttons.
-	virtual bool GetButtonAccept() { return GetButton0(); }
-	virtual bool GetButtonReject() { return GetButton1(); }
-	virtual bool GetButtonHome() { return false; }
-};
-
-// Virtual dispatcher, for use in composition.
-class IDispatcher {
-public:
-	virtual void OnDataUpdated() {}
-	virtual void OnStateChanged(const bool connected) {}
-};
-
-
-// Axis parser.
-template<typename T,
-	typename OutT,
-	const T Min,
-	const T Max,
-	const T DeadZoneRange,
-	const OutT OutBottom,
-	const OutT OutTop>
-	class AxisLinear
-{
-public:
-	OutT Parse(const T value)
+	template<const uint8_t buttonIndex>
+	static constexpr bool GetButton(const uint8_t buttonsState)
 	{
-		// Clip input to min/max.
-		T ValueClipped = value;
+		return buttonsState & ButtonMask<buttonIndex>();
+	}
 
-		if (value >= Max)
-		{
-			ValueClipped = Max;
-		}
-		else if (value < Min)
-		{
-			ValueClipped = Min;
-		}
+public:
+	IInputController(const uint16_t features = 0) : Features(features)
+	{}
 
-		// Deadzone low region.
-		if (ValueClipped < DeadZoneRange)
+	/// <summary>
+	/// State interface.
+	/// </summary>
+public:
+	void Clear()
+	{
+		State.Clear();
+	}
+
+	void CopyStateTo(controller_state_t& controllerState)
+	{
+		State.CopyTo(controllerState);
+	}
+
+	void CopyStateTo(IInputController& controllerState)
+	{
+		State.CopyTo(controllerState.State);
+	}
+
+	void CopyStateFrom(const controller_state_t& controllerState)
+	{
+		State.CopyFrom(controllerState);
+	}
+
+	void CopyStateFrom(const IInputController& controllerState)
+	{
+		State.CopyFrom(controllerState.State);
+	}
+
+	/// <summary>
+	/// Navigation interface, based on declared features.
+	/// </summary>
+public:
+	const bool Connected() const
+	{
+		return State.Connected;
+	}
+
+	const bool GetHome() const
+	{
+		if (FeatureHome())
 		{
-			return OutBottom;
+			return Home();
 		}
 		else
 		{
-			return ((ValueClipped - DeadZoneRange) * (OutTop - OutBottom)) / (Max - DeadZoneRange);
+			return Start();
 		}
 	}
-};
 
-// Joystick parser.
-template<typename T,
-	typename OutT,
-	const T Min,
-	const T Max,
-	const int8_t Offset,
-	const T DeadZoneRange,
-	const OutT OutBottom,
-	const OutT OutTop>
-	class AxisCentered
-{
-private:
-	const T Mid = ((Max + Min) / 2) - Offset;
-	const T MidUpper = Mid + DeadZoneRange;
-	const T MidLower = Mid - DeadZoneRange;
-	const OutT OutCenter = ((OutTop + OutBottom) / 2);
-
-public:
-	T GetCenter()
+	const bool GetAccept() const
 	{
-		return Mid;
-	}
-
-	OutT Parse(const T value)
-	{
-		// Clip input to min/max.
-		T ValueClipped = value;
-
-		if (value >= Max)
+		if (FeatureBAccept())
 		{
-			ValueClipped = Max;
-		}
-		else if (value < Min)
-		{
-			ValueClipped = Min;
-		}
-
-		// Deadzone center region. Only works well for small values (< 5).
-		if (ValueClipped >= Mid)
-		{
-			if (ValueClipped < MidUpper)
-			{
-				return OutCenter;
-			}
-			else
-			{
-				return OutCenter + (((ValueClipped - MidUpper) * (OutTop - OutCenter)) / (Max - MidUpper));
-			}
+			return B();
 		}
 		else
 		{
-			if (ValueClipped > MidLower)
-			{
-				return OutCenter;
-			}
-			else
-			{
-				return OutCenter - (((MidLower - ValueClipped) * (OutCenter - OutBottom)) / (MidLower - Min));
-			}
+			return A();
 		}
 	}
-};
 
-// Button parser.
-class ButtonPress
-{
-private:
-	bool Up = false;
+	const bool GetReject() const
+	{
+		if (FeatureYReject())
+		{
+			return Y();
+		}
+		else if (FeatureBAccept())
+		{
+			return A();
+		}
+		else
+		{
+			return B();
+		}
+	}
 
+	/// <summary>
+	/// Controller Joysticks, Triggers and Buttons read interface.
+	/// </summary>
 public:
-	bool Parse(const bool button)
+	const DPadEnum DPad() const
 	{
-		if (Up && !button)
-		{
-			Up = false;
-			return true;
-		}
-		else if (!Up && button)
-		{
-			Up = true;
-		}
-
-		return false;
+		return State.DPad;
 	}
-};
 
-// Timed button parser.
-class TimedButtonPress
-{
-private:
-	bool Up = false;
-	uint32_t Time = 0;
+	const bool DPadUp() const
+	{
+		return State.DPad == DPadEnum::Up || State.DPad == DPadEnum::UpLeft || State.DPad == DPadEnum::UpRight;
+	}
 
+	const bool DPadDown() const
+	{
+		return State.DPad == DPadEnum::Down || State.DPad == DPadEnum::DownLeft || State.DPad == DPadEnum::DownRight;
+	}
+
+	const bool DPadLeft() const
+	{
+		return State.DPad == DPadEnum::Left || State.DPad == DPadEnum::DownLeft || State.DPad == DPadEnum::UpLeft;
+	}
+
+	const bool DPadRight() const
+	{
+		return State.DPad == DPadEnum::Right || State.DPad == DPadEnum::DownRight || State.DPad == DPadEnum::UpRight;;
+	}
+
+	const int16_t Joy1X()
+	{
+		return State.Joy1X;
+	}
+
+	const int16_t Joy1Y()
+	{
+		return State.Joy1Y;
+	}
+
+	const int16_t Joy2X()
+	{
+		return State.Joy2X;
+	}
+
+	const int16_t Joy2Y()
+	{
+		return State.Joy2Y;
+	}
+
+	const uint16_t L2()
+	{
+		return State.L2;
+	}
+
+	const uint16_t R2()
+	{
+		return State.R2;
+	}
+
+	const bool A() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::A>(State.MainButtons);
+	}
+
+	const bool B() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::B>(State.MainButtons);
+	}
+
+	const bool X() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::X>(State.MainButtons);
+	}
+
+	const bool Y() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::Y>(State.MainButtons);
+	}
+
+	const bool L1() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::L1>(State.MainButtons);
+	}
+
+	const bool L3() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::L3>(State.MainButtons);
+	}
+
+	const bool R1() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::R1>(State.MainButtons);
+	}
+
+	const bool R3() const
+	{
+		return GetButton<(uint8_t)MainButtonEnum::R3>(State.MainButtons);
+	}
+
+	const bool Start() const
+	{
+		return GetButton<(uint8_t)MenuButtonEnum::Start>(State.MenuButtons);
+	}
+
+	const bool Select() const
+	{
+		return GetButton<(uint8_t)MenuButtonEnum::Select>(State.MenuButtons);
+	}
+
+	const bool Home() const
+	{
+		return GetButton<(uint8_t)MenuButtonEnum::Home>(State.MenuButtons);
+	}
+
+	const bool Share() const
+	{
+		return GetButton<(uint8_t)MenuButtonEnum::Share>(State.MenuButtons);
+	}
+
+	/// <summary>
+	/// Features interface.
+	/// </summary>
 public:
-	bool Parse(const bool button)
+	const bool FeatureJoy2() const
 	{
-		if (Up && !button)
-		{
-			Up = false;
-			Time = millis() - Time;
-
-			return true;
-		}
-		else if (!Up && button)
-		{
-			Time = millis();
-			Up = true;
-			return false;
-		}
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Joy2>(Features);
 	}
 
-	uint32_t GetDurationMillis()
+	const bool FeatureJoy2Digital() const
 	{
-		return Time;
-	}
-};
-
-// Hold button parser.
-template<const uint32_t MinDurationMillis>
-class MinTimedButtonPress
-{
-private:
-	bool Up = false;
-	uint32_t Time = 0;
-
-public:
-	bool Parse(const bool button)
-	{
-		if (Up && !button)
-		{
-			Up = false;
-			Time = millis() - Time;
-
-			return Time > MinDurationMillis;
-		}
-		else if (!Up && button)
-		{
-			Time = millis();
-			Up = true;
-			return false;
-		}
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Joy2Digital>(Features);
 	}
 
-	uint32_t GetDurationMillis()
+	const bool FeatureL2R2Digital() const
 	{
-		return Time;
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L2R2Digital>(Features);
+	}
+
+	const bool FeatureBAccept() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::BAccept>(Features);
+	}
+
+	const bool FeatureYReject() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::YReject>(Features);
+	}
+
+	const bool FeatureShare() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Share>(Features);
+	}
+
+	const bool FeatureSelect() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Select>(Features);
+	}
+
+	const bool FeatureHome() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Home>(Features);
+	}
+
+	const bool FeatureL1() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L1>(Features);
+	}
+
+	const bool FeatureR1() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R1>(Features);
+	}
+
+	const bool FeatureL2() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L2>(Features);
+	}
+
+	const bool FeatureR2() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R2>(Features);
+	}
+
+	const bool FeatureL3() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L3>(Features);
+	}
+
+	const bool FeatureR3() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R3>(Features);
 	}
 };
 #endif

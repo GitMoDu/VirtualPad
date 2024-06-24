@@ -1,12 +1,34 @@
 # IInputController
-Input controller with task and output delegate.
 
-Virtual interface provides an abstracted controller input for any use.
+Abstracted controller, inspired by RetroArch's RetroPad.
 
-# Template Controller Dependencies
-Task Scheduler - https://github.com/arkhipenko/TaskScheduler
+IInputController
 
-# Controller Implementation Dependencies
-GameCube and N64 controller tasks provided and tested working on Arduino STM32 ( https://github.com/rogerclarkmelbourne/Arduino_STM32)
+	- Read API for controller state.
 
-Nintendo Controler Reader - https://github.com/GitMoDu/NintendoControllerReader
+	- Optional shallow, for double buffering state.
+
+	- Bit field button state, optimized for low RAM and fast copy.
+
+WriteInputController
+	- Inherits from IInputController.
+	- Write API for controller state.
+
+
+
+# Examples provided
+
+- Arduino ADC+IO simple IInputController
+
+- Nintendo controllers to IInputController
+	- Depends on https://github.com/GitMoDu/JoybusOverUart
+
+- Passthrough to XBox360
+	- STM32Duino only https://github.com/rogerclarkmelbourne/Arduino_STM32
+	- Depends on https://github.com/arpruss/USBComposite_stm32f1
+
+
+# Task Controller Dependencies
+
+- Task Scheduler https://github.com/arkhipenko/TaskScheduler
+
