@@ -1,14 +1,15 @@
 /*
-* Example Demo of IInputController.
-* Uncomment the desired controller to use.
+* Example Controller Demo.
+* Reads a source controller and translates to abstract IInputController.
 * Logs the abstracted IInputController to Serial.
+* Uncomment the desired source controller to use.
 * Nintendo controllers depend on https://github.com/GitMoDu/JoybusOverUart
 */
 
 
 // Uncomment controller to use.
-//#define DIRECT_CONTROLLER
-#define USE_N64_CONTROLLER
+#define DIRECT_CONTROLLER
+//#define USE_N64_CONTROLLER
 //#define USE_GAMECUBE_CONTROLLER
 
 #define SERIAL_BAUD_RATE 115200
@@ -19,8 +20,9 @@ static constexpr uint32_t UpdatePeriodMillis = 20;
 static constexpr uint32_t LogPeriodMillis = 50;
 static constexpr uint32_t LogLongPeriodMillis = 1000;
 static constexpr uint32_t TimeOutPeriodMillis = 100;
+#if defined(USE_N64_CONTROLLER) || defined(USE_GAMECUBE_CONTROLLER)
 static constexpr HardwareSerial* JoyBusSerial = &Serial3;
-
+#endif
 
 #if defined(DIRECT_CONTROLLER)
 DirectInputController InputController(A0, A1, 3, 4);
