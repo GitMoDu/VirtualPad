@@ -15,7 +15,8 @@ enum class DPadEnum : uint8_t
 	DownLeft = 5,
 	DownRight = 6,
 	Left = 7,
-	Right = 8
+	Right = 8,
+	DPadEnumCount
 };
 
 enum class MainButtonEnum : uint8_t
@@ -27,7 +28,8 @@ enum class MainButtonEnum : uint8_t
 	L1 = 4,
 	R1 = 5,
 	L3 = 6,
-	R3 = 7
+	R3 = 7,
+	MainButtonEnumCount
 };
 
 enum class MenuButtonEnum : uint8_t
@@ -35,7 +37,8 @@ enum class MenuButtonEnum : uint8_t
 	Start = 0,
 	Select = 1,
 	Home = 2,
-	Share = 3
+	Share = 3,
+	MenuButtonEnumCount
 };
 
 #endif
