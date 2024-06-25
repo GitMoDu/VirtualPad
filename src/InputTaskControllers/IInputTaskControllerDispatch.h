@@ -35,9 +35,6 @@ private:
 private:
 	StateEnum State = StateEnum::FastUpdate;
 
-protected:
-	virtual void UpdateInput() {}
-
 public:
 	IInputTaskControllerDispatch(Scheduler* scheduler,
 		IInputController* inputController, const uint32_t updatePeriodMillis,
@@ -49,6 +46,7 @@ public:
 
 	void Start()
 	{
+		State = StateEnum::FastUpdate;
 		Task::enable();
 	}
 

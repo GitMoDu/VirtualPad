@@ -3,6 +3,7 @@
 #ifndef _IINPUT_CONTROLLER_TO_X360_TASK_h
 #define _IINPUT_CONTROLLER_TO_X360_TASK_h
 
+#if defined(ARDUINO_ARCH_STM32F1)
 #define _TASK_OO_CALLBACKS
 #include <TaskSchedulerDeclarations.h>
 
@@ -156,5 +157,5 @@ public:
 		X360.send();
 	}
 };
-
+#endif
 #endif
