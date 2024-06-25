@@ -26,7 +26,7 @@ namespace AxisParser
 	/// <typeparam name="Reference"></typeparam>
 	/// <typeparam name="Hysteresis"></typeparam>
 	template<uint16_t Reference = UINT16_MAX / 2,
-		uint16_t Hysteresis = UINT16_MAX / 8>
+		uint16_t Hysteresis = UINT16_MAX / 16>
 	class AxisAnalogToDigitalAction
 	{
 	private:
@@ -48,6 +48,15 @@ namespace AxisParser
 		}
 
 		/// <summary>
+		/// True if any action is flagged.
+		/// </summary>
+		/// <returns></returns>
+		const bool HasAction() const
+		{
+			return Actions != 0;
+		}
+
+		/// <summary>
 		/// Returns true on button up action.
 		/// </summary>
 		const bool ActionUp() const
@@ -58,12 +67,12 @@ namespace AxisParser
 		/// <summary>
 		/// Returns true on button down action.
 		/// </summary>
-		const bool ActionDown()
+		const bool ActionDown() const
 		{
 			return Actions & (1 << (uint8_t)ActionEnum::Down);
 		}
 
-		void Parse(const uint16_t value)
+		const bool Parse(const uint16_t value)
 		{
 			Actions = 0;
 
@@ -85,6 +94,8 @@ namespace AxisParser
 					Actions |= (1 << (uint8_t)ActionEnum::Down);
 				}
 			}
+
+			return Actions != 0;
 		}
 	};
 }

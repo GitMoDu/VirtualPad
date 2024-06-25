@@ -76,7 +76,7 @@ namespace JoystickParser
 	/// <typeparam name="Hysteresis"></typeparam>
 	template<int16_t ReferenceNegative = INT16_MIN / 2,
 		int16_t ReferencePositive = INT16_MAX / 2,
-		uint16_t Hysteresis = UINT16_MAX / 8>
+		uint16_t Hysteresis = UINT16_MAX / 16>
 	class JoystickAnalogToDigitalAction
 	{
 	private:
@@ -101,6 +101,15 @@ namespace JoystickParser
 		StateEnum StateY = StateEnum::Neutral;
 
 	public:
+		/// <summary>
+		/// True if any action is flagged.
+		/// </summary>
+		/// <returns></returns>
+		const bool HasAction() const
+		{
+			return Actions != 0;
+		}
+
 		/// <summary>
 		/// Returns true on up action.
 		/// </summary>
@@ -133,9 +142,10 @@ namespace JoystickParser
 			return Actions & (1 << (uint8_t)ActionEnum::Right);
 		}
 
-		void Parse(const int16_t x, const int16_t y)
+		const bool Parse(const int16_t x, const int16_t y)
 		{
 			Actions = 0;
+			bool action = false;
 
 			if (x >= ReferencePositive)
 			{
@@ -146,6 +156,7 @@ namespace JoystickParser
 					{
 						StateX = StateEnum::Positive;
 						Actions |= (1 << (uint8_t)ActionEnum::Right);
+						action = true;
 					}
 					break;
 				case StateEnum::Negative:
@@ -153,6 +164,7 @@ namespace JoystickParser
 					{
 						StateX = StateEnum::Positive;
 						Actions |= (1 << (uint8_t)ActionEnum::Right);
+						action = true;
 					}
 					else
 					{
@@ -173,6 +185,7 @@ namespace JoystickParser
 					{
 						StateX = StateEnum::Negative;
 						Actions |= (1 << (uint8_t)ActionEnum::Left);
+						action = true;
 					}
 					break;
 				case StateEnum::Positive:
@@ -180,6 +193,7 @@ namespace JoystickParser
 					{
 						StateX = StateEnum::Negative;
 						Actions |= (1 << (uint8_t)ActionEnum::Left);
+						action = true;
 					}
 					else
 					{
@@ -212,6 +226,88 @@ namespace JoystickParser
 					break;
 				}
 			}
+
+			if (y >= ReferencePositive)
+			{
+				switch (StateY)
+				{
+				case StateEnum::Neutral:
+					if (y >= (ReferencePositive + Hysteresis))
+					{
+						StateY = StateEnum::Positive;
+						Actions |= (1 << (uint8_t)ActionEnum::Up);
+						action = true;
+					}
+					break;
+				case StateEnum::Negative:
+					if (y >= (ReferencePositive + Hysteresis))
+					{
+						StateY = StateEnum::Positive;
+						Actions |= (1 << (uint8_t)ActionEnum::Up);
+						action = true;
+					}
+					else
+					{
+						StateY = StateEnum::Neutral;
+					}
+					break;
+				case StateEnum::Positive:
+				default:
+					break;
+				}
+			}
+			else if (y <= ReferenceNegative)
+			{
+				switch (StateY)
+				{
+				case StateEnum::Neutral:
+					if (y <= (ReferenceNegative - Hysteresis))
+					{
+						StateY = StateEnum::Negative;
+						Actions |= (1 << (uint8_t)ActionEnum::Down);
+						action = true;
+					}
+					break;
+				case StateEnum::Positive:
+					if (y <= (ReferenceNegative - Hysteresis))
+					{
+						StateY = StateEnum::Negative;
+						Actions |= (1 << (uint8_t)ActionEnum::Down);
+						action = true;
+					}
+					else
+					{
+						StateY = StateEnum::Neutral;
+					}
+					break;
+				case StateEnum::Negative:
+				default:
+					break;
+				}
+			}
+			else
+			{
+				switch (StateY)
+				{
+				case StateEnum::Negative:
+					if (y >= (ReferenceNegative + Hysteresis))
+					{
+						StateY = StateEnum::Neutral;
+					}
+					break;
+				case StateEnum::Positive:
+					if (y < (ReferencePositive - Hysteresis))
+					{
+						StateY = StateEnum::Neutral;
+					}
+					break;
+				case StateEnum::Neutral:
+				default:
+					break;
+				}
+			}
+
+			return action;
 		}
 
 		void Clear()
