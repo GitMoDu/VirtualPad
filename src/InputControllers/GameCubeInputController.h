@@ -43,6 +43,7 @@ public:
 		SetL1(data.Button<ButtonsEnum::L1>());
 		SetR1(data.Button<ButtonsEnum::R1>());
 		SetStart(data.Button<ButtonsEnum::Start>());
+		SetR3(data.Button<ButtonsEnum::Z>());
 
 		SetDPad(data.Button<ButtonsEnum::Up>(), data.Button<ButtonsEnum::Down>(), data.Button<ButtonsEnum::Left>(), data.Button<ButtonsEnum::Right>());
 
