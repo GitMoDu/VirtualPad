@@ -1,34 +1,49 @@
 # IInputController
 
-Abstracted controller, inspired by RetroArch's RetroPad.
+Embedded virtual controller, inspired by RetroArch's RetroPad.
 
-IInputController
+## IInputController
+- Read API for controller state
+- Optional shallow copy, for double buffering state
+- Bit field button states, optimized for low RAM and fast copy
+- ControllerParser to extract action events or digital values from an analog source
+	- Button Up/Down
+ 	- Joystick Up/Down/Left/Right
+  	- Axis Up/Down
 
-	- Read API for controller state.
-
-	- Optional shallow, for double buffering state.
-
-	- Bit field button state, optimized for low RAM and fast copy.
-
-WriteInputController
-	- Inherits from IInputController.
-	- Write API for controller state.
+### WriteInputController
+- Inherits from IInputController
+- Write API for controller state
+- IInputMapper helper to translate "analog" values (Joysticks and Sliders)
 
 
+## Supported Source Controllers
+- Arduino ADC+IO simple controller.
+- Nintendo64/GameCube controllers (JoybusOverUart https://github.com/GitMoDu/JoybusOverUart)
 
-# Examples provided
+## Task Based Beatures
+Task features depend on Task Scheduler https://github.com/arkhipenko/TaskScheduler
 
-- Arduino ADC+IO simple IInputController
+- ControllerMap: fixed period, template mapper from source to typed IInputController
+- ControllerDispatch: fixed period notifier for dispatch interface
+- ControllerToX360: fixed period mapper from IInputController to USB-XBox360 controller
 
-- Nintendo controllers to IInputController
-	- Depends on https://github.com/GitMoDu/JoybusOverUart
+## Examples provided
 
-- Passthrough to XBox360
+- Source Controller to IInputController
+	- Arduino ADC+IO
+	- Nintendo64/GameCube
+
+- Dispatch listener with IInputControllerDispatch interface
+
+- Button Actions
+	- Single action for each button event
+ 	- Actions expire after each parse step
+	- Joystick digitalization, with hysteresis
+
+- Nintendo64/GameCube controllers Passthrough to XBox360
 	- STM32Duino only https://github.com/rogerclarkmelbourne/Arduino_STM32
-	- Depends on https://github.com/arpruss/USBComposite_stm32f1
+	- USB-XBox360 https://github.com/arpruss/USBComposite_stm32f1
 
-
-# Task Controller Dependencies
-
-- Task Scheduler https://github.com/arkhipenko/TaskScheduler
-
+ 
+ 
