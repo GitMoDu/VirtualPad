@@ -93,7 +93,7 @@ namespace ButtonParser
 	/// <summary>
 	/// Parses Up/Down actions.
 	/// </summary>
-	class ButtonActionTimed
+	class ActionTimed
 	{
 	private:
 		enum class ActionEnum : uint8_t
@@ -108,6 +108,7 @@ namespace ButtonParser
 		uint8_t Actions = 0;
 		bool State = false;
 
+	public:
 		void Clear()
 		{
 			State = false;
