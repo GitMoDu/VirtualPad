@@ -1,19 +1,19 @@
-# IInputController
+# VirtualPad
 
 Embedded virtual controller, inspired by RetroArch's RetroPad.
 
-## IInputController
-- Read API for controller state
-- Optional shallow copy, for double buffering state
-- Bit field button states, optimized for low RAM and fast copy
+## IVirtualPad
+- Read only API for controller state.
+- Fast state copy, for double buffering.
+- Bit field button states, optimized for low RAM and fast copy.
 - ControllerParser to extract action events or digital values from an analog source
 	- Button Up/Down
  	- Joystick Up/Down/Left/Right
   	- Axis Up/Down
 
-### WriteInputController
-- Inherits from IInputController
-- Write API for controller state
+### VirtualPad
+- Inherits from IVirtualPad
+- Write/Read API for controller state
 - IInputMapper helper to translate "analog" values (Joysticks and Sliders)
 
 
