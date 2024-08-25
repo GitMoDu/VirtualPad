@@ -2,7 +2,7 @@
 
 Embedded virtual controller, inspired by RetroArch's RetroPad.
 
-## IVirtualPad
+## VirtualPad
 - Read only API for controller state.
 - Fast state copy, for double buffering.
 - Bit field button states, optimized for low RAM and fast copy.
@@ -11,7 +11,7 @@ Embedded virtual controller, inspired by RetroArch's RetroPad.
  	- Joystick Up/Down/Left/Right
   	- Axis Up/Down
 
-### VirtualPad
+### WriteVirtualPad
 - Inherits from IVirtualPad
 - Write/Read API for controller state
 - IInputMapper helper to translate "analog" values (Joysticks and Sliders)
