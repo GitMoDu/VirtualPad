@@ -23,11 +23,11 @@ private:
 	InputControllerType& InputController;
 
 public:
-	IInputTaskControllerMap(Scheduler* scheduler,
+	IInputTaskControllerMap(Scheduler& scheduler,
 		SourceDataType& controllerState,
 		InputControllerType& inputController,
 		const uint32_t updatePeriodMicros)
-		: Task(TASK_IMMEDIATE, TASK_FOREVER, scheduler, false)
+		: Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
 		, ControllerState(controllerState)
 		, InputController(inputController)
 	{}

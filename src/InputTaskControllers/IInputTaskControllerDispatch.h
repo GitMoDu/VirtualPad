@@ -36,10 +36,10 @@ private:
 	StateEnum State = StateEnum::FastUpdate;
 
 public:
-	IInputTaskControllerDispatch(Scheduler* scheduler,
+	IInputTaskControllerDispatch(Scheduler& scheduler,
 		IInputController* inputController, const uint32_t updatePeriodMillis,
 		IInputControllerDispatch* dispatch = nullptr)
-		: Task(updatePeriodMillis, TASK_FOREVER, scheduler, false)
+		: Task(updatePeriodMillis, TASK_FOREVER, &scheduler, false)
 		, InputController(inputController)
 		, Dispatch(dispatch)
 	{}
