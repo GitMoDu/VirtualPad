@@ -1,7 +1,7 @@
-// controller_state.h
+// PadState.h
 
-#ifndef _CONTROLLER_STATE_h
-#define _CONTROLLER_STATE_h
+#ifndef _PAD_STATE_h
+#define _PAD_STATE_h
 
 #include <stdint.h>
 
@@ -43,7 +43,7 @@
 /// [L2]		[R2]
 /// 
 /// </summary>
-struct controller_state_t
+struct PadState
 {
 	int16_t Joy1X = 0;
 	int16_t Joy1Y = 0;
@@ -82,7 +82,7 @@ struct controller_state_t
 		Connected = false;
 	}
 
-	void CopyTo(controller_state_t& controllerState)
+	void CopyTo(PadState& controllerState)
 	{
 		controllerState.Joy1X = Joy1X;
 		controllerState.Joy1Y = Joy1Y;
@@ -98,7 +98,7 @@ struct controller_state_t
 		controllerState.Connected = Connected;
 	}
 
-	void CopyFrom(const controller_state_t& controllerState)
+	void CopyFrom(const PadState& controllerState)
 	{
 		Joy1X = controllerState.Joy1X;
 		Joy1Y = controllerState.Joy1Y;

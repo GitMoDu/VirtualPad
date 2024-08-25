@@ -1,48 +1,26 @@
-// WriteIInputController.h
+// WriteVirtualPad.h
 
-#ifndef _WRITE_I_INPUT_CONTROLLER_h
-#define _WRITE_I_INPUT_CONTROLLER_h
+#ifndef _WRITE_VIRTUAL_PAD_h
+#define _WRITE_VIRTUAL_PAD_h
 
-#include "IInputController.h"
+#include "VirtualPad.h"
 
 /// <summary>
-/// IInputController write interface.
+/// VirtualPad write interface.
 /// </summary>
-class WriteInputController : public IInputController
+class WriteVirtualPad : public VirtualPad
 {
-private:
-	template<const MainButtonEnum button>
-	void SetMainButton(const bool value)
-	{
-		if (value)
-		{
-			State.MainButtons |= ButtonMask<(uint8_t)button>();
-		}
-		else
-		{
-			State.MainButtons &= ~ButtonMask<(uint8_t)button>();
-		}
-	}
-
-	template<const MenuButtonEnum button>
-	void SetMenuButton(const bool value)
-	{
-		if (value)
-		{
-			State.MenuButtons |= ButtonMask<(uint8_t)button>();
-		}
-		else
-		{
-			State.MenuButtons &= ~ButtonMask<(uint8_t)button>();
-		}
-	}
-
 public:
-	WriteInputController(const uint16_t features = 0)
-		: IInputController(features)
+	WriteVirtualPad(const uint16_t features = 0)
+		: VirtualPad(features)
 	{}
 
 public:
+	void SetConnected(const bool connected)
+	{
+		State.Connected = connected;
+	}
+
 	void SetJoy1(const int8_t x, const int8_t y)
 	{
 		if (x >= 0)
@@ -224,7 +202,7 @@ public:
 		}
 		else if (left)
 		{
-			State.DPad = DPadEnum::Left;			
+			State.DPad = DPadEnum::Left;
 		}
 		else if (right)
 		{
@@ -294,6 +272,33 @@ public:
 	void SetShare(const bool value)
 	{
 		SetMenuButton<MenuButtonEnum::Share>(value);
+	}
+
+private:
+	template<const MainButtonEnum button>
+	void SetMainButton(const bool value)
+	{
+		if (value)
+		{
+			State.MainButtons |= ButtonMask<(uint8_t)button>();
+		}
+		else
+		{
+			State.MainButtons &= ~ButtonMask<(uint8_t)button>();
+		}
+	}
+
+	template<const MenuButtonEnum button>
+	void SetMenuButton(const bool value)
+	{
+		if (value)
+		{
+			State.MenuButtons |= ButtonMask<(uint8_t)button>();
+		}
+		else
+		{
+			State.MenuButtons &= ~ButtonMask<(uint8_t)button>();
+		}
 	}
 };
 

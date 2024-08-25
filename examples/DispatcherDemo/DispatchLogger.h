@@ -3,12 +3,12 @@
 #ifndef _DISPATCH_LOGGER_h
 #define _DISPATCH_LOGGER_h
 
-#include <InputTaskControllers.h>
+#include <VirtualPad.h>
 
 /// <summary>
-/// Example class with virtual IInputControllerDispatch interface.
+/// Example class with virtual VirtualPadListener interface.
 /// </summary>
-class DispatchLogger : public virtual IInputControllerDispatch
+class DispatchLogger : public virtual VirtualPadListener
 {
 private:
 	const uint32_t LogPeriodMillis;
@@ -16,13 +16,14 @@ private:
 
 public:
 	DispatchLogger(const uint32_t logPeriodMillis)
-		: LogPeriodMillis(logPeriodMillis)
+		: VirtualPadListener()
+		, LogPeriodMillis(logPeriodMillis)
 	{}
 
 public:
-	void OnControllerUpdate(IInputController* controller) final
+	void OnUpdate(VirtualPad* pad) final
 	{
-		if (controller->Connected())
+		if (pad->Connected())
 		{
 			// Only log to serial if enough time has passed since last update.
 			if (millis() - LastLog >= LogPeriodMillis)
@@ -31,22 +32,22 @@ public:
 
 				Serial.println();
 				Serial.print(F("Navigation\t"));
-				if (controller->GetHome())
+				if (pad->GetHome())
 				{
 					Serial.print(F("Home "));
 				}
-				if (controller->GetAccept())
+				if (pad->GetAccept())
 				{
 					Serial.print(F("Accept "));
 				}
-				if (controller->GetReject())
+				if (pad->GetReject())
 				{
 					Serial.print(F("Reject "));
 				}
 				Serial.println();
 
 				Serial.print(F("DPad\t"));
-				switch (controller->DPad())
+				switch (pad->DPad())
 				{
 				case DPadEnum::Up:
 					Serial.println(F("Up"));
@@ -79,7 +80,7 @@ public:
 				}
 
 				Serial.print(F("Main Buttons\t"));
-				if (controller->A())
+				if (pad->A())
 				{
 					Serial.print(F("A  "));
 				}
@@ -88,7 +89,7 @@ public:
 					Serial.print(F("__ "));
 				}
 
-				if (controller->B())
+				if (pad->B())
 				{
 					Serial.print(F("B  "));
 				}
@@ -97,7 +98,7 @@ public:
 					Serial.print(F("__ "));
 				}
 
-				if (controller->X())
+				if (pad->X())
 				{
 					Serial.print(F("X  "));
 				}
@@ -106,7 +107,7 @@ public:
 					Serial.print(F("__ "));
 				}
 
-				if (controller->Y())
+				if (pad->Y())
 				{
 					Serial.print(F("Y  "));
 				}
@@ -115,9 +116,9 @@ public:
 					Serial.print(F("__ "));
 				}
 
-				if (controller->FeatureL1())
+				if (pad->FeatureL1())
 				{
-					if (controller->L1())
+					if (pad->L1())
 					{
 						Serial.print(F("L1 "));
 					}
@@ -127,9 +128,9 @@ public:
 					}
 				}
 
-				if (controller->FeatureR1())
+				if (pad->FeatureR1())
 				{
-					if (controller->R1())
+					if (pad->R1())
 					{
 						Serial.print(F("R1 "));
 					}
@@ -139,9 +140,9 @@ public:
 					}
 				}
 
-				if (controller->FeatureL3())
+				if (pad->FeatureL3())
 				{
-					if (controller->L3())
+					if (pad->L3())
 					{
 						Serial.print(F("L3 "));
 					}
@@ -151,9 +152,9 @@ public:
 					}
 				}
 
-				if (controller->FeatureR3())
+				if (pad->FeatureR3())
 				{
-					if (controller->R3())
+					if (pad->R3())
 					{
 						Serial.print(F("R3 "));
 					}
@@ -165,49 +166,49 @@ public:
 				Serial.println();
 
 				Serial.print(F("Menu Buttons\t"));
-				if (controller->Start())
+				if (pad->Start())
 				{
 					Serial.print(F("Start "));
 				}
-				if (controller->Select())
+				if (pad->Select())
 				{
 					Serial.print(F("Select "));
 				}
-				if (controller->Home())
+				if (pad->Home())
 				{
 					Serial.print(F("Home "));
 				}
-				if (controller->Share())
+				if (pad->Share())
 				{
 					Serial.print(F("Share "));
 				}
 				Serial.println();
 
 				Serial.print(F("Joy1(x,y)\t("));
-				Serial.print(controller->Joy1X());
+				Serial.print(pad->Joy1X());
 				Serial.print(',');
-				Serial.print(controller->Joy1Y());
+				Serial.print(pad->Joy1Y());
 				Serial.println(')');
 
-				if (controller->FeatureJoy2())
+				if (pad->FeatureJoy2())
 				{
 					Serial.print(F("Joy2(x,y)\t("));
-					Serial.print(controller->Joy2X());
+					Serial.print(pad->Joy2X());
 					Serial.print(',');
-					Serial.print(controller->Joy2Y());
+					Serial.print(pad->Joy2Y());
 					Serial.println(')');
 				}
 
-				if (controller->FeatureL2())
+				if (pad->FeatureL2())
 				{
 					Serial.print(F("L2\t"));
-					Serial.println(controller->L2());
+					Serial.println(pad->L2());
 				}
 
-				if (controller->FeatureR2())
+				if (pad->FeatureR2())
 				{
 					Serial.print(F("R2\t"));
-					Serial.println(controller->R2());
+					Serial.println(pad->R2());
 				}
 			}
 		}

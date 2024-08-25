@@ -1,7 +1,7 @@
 /*
 * Example Controller Demo.
-* Reads a source controller and translates to abstract IInputController.
-* Logs the abstracted IInputController to Serial.
+* Reads a source controller, translates and writes to VirtualPad.
+* Logs the VirtualPad state to Serial.
 * Uncomment the desired source controller to use.
 * Nintendo controllers depend on https://github.com/GitMoDu/JoybusOverUart
 */
@@ -14,7 +14,7 @@
 
 #define SERIAL_BAUD_RATE 115200
 
-#include <InputControllers.h>
+#include <VirtualPadSources.h>
 
 static constexpr uint32_t UpdatePeriodMillis = 20;
 static constexpr uint32_t LogPeriodMillis = 50;
@@ -25,18 +25,18 @@ static constexpr HardwareSerial* JoyBusSerial = &Serial3;
 #endif
 
 #if defined(DIRECT_CONTROLLER)
-DirectInputController InputController(A0, A1, 3, 4);
+DirectInputVirtualPadWriter Pad(A0, A1, 3, 4);
 #elif defined(USE_N64_CONTROLLER)
 #include <Nintendo64OverUart.h>
 Nintendo64OverUart JoyBusReader(JoyBusSerial);
 Nintendo64Controller::data_t ControllerData{};
-Nintendo64InputController<> InputController{};
+Nintendo64VirtualPadWriter<> Pad{};
 bool Polling = false;
 #elif defined(USE_GAMECUBE_CONTROLLER)
 #include <GameCubeOverUart.h>
 GameCubeOverUart JoyBusReader(JoyBusSerial);
 GameCubeController::data_t ControllerData{};
-GameCubeInputController<> InputController{};
+GameCubeVirtualPadWriter<> Pad{};
 #endif
 
 uint32_t LastUpdate = 0;
@@ -62,7 +62,7 @@ void setup()
 	Serial.print(F("Controller Demo..."));
 
 #if defined(DIRECT_CONTROLLER)
-	if (!InputController.Setup())
+	if (!Pad.Setup())
 	{
 		Halt();
 }
@@ -85,7 +85,7 @@ void loop()
 	if (timestamp - LastUpdate >= UpdatePeriodMillis)
 	{
 		LastUpdate = timestamp;
-		InputController.Step();
+		Pad.Step();
 }
 #elif defined(USE_N64_CONTROLLER)
 	if (timestamp - LastUpdate >= UpdatePeriodMillis)
@@ -94,24 +94,24 @@ void loop()
 		delay(1);
 		if (JoyBusReader.ReadControllerData(ControllerData))
 		{
-			InputController.MapControllerData(ControllerData);
+			Pad.MapControllerData(ControllerData);
 			LastUpdate = timestamp;
-			if (!InputController.Connected())
+			if (!Pad.Connected())
 			{
-				InputController.State.Connected = true;
+				Pad.SetConnected(true);
 			}
 		}
 		else if (timestamp - LastUpdate >= TimeOutPeriodMillis)
 		{
-			if (InputController.Connected())
+			if (Pad.Connected())
 			{
 				LastLog = millis() - LogLongPeriodMillis;
 			}
-			InputController.Clear();
+			Pad.Clear();
 		}
 	}
 #elif defined(USE_GAMECUBE_CONTROLLER)
-	if (InputController.Connected())
+	if (Pad.Connected())
 	{
 		if (timestamp - LastUpdate >= UpdatePeriodMillis)
 		{
@@ -119,12 +119,12 @@ void loop()
 			delay(1);
 			if (JoyBusReader.ReadControllerData(ControllerData))
 			{
-				InputController.MapControllerData(ControllerData);
+				Pad.MapControllerData(ControllerData);
 				LastUpdate = timestamp;
 			}
 			else if (timestamp - LastUpdate >= TimeOutPeriodMillis)
 			{
-				InputController.Clear();
+				Pad.Clear();
 			}
 		}
 	}
@@ -136,7 +136,7 @@ void loop()
 			delay(1);
 			if (JoyBusReader.ReadControllerData(ControllerData))
 			{
-				InputController.State.Connected = true;
+				Pad.SetConnected(true);
 				LastUpdate = timestamp - UpdatePeriodMillis;
 			}
 			else
@@ -152,7 +152,7 @@ void loop()
 
 void LogIInputControllerState()
 {
-	if (InputController.Connected())
+	if (Pad.Connected())
 	{
 		if (millis() - LastLog >= LogPeriodMillis)
 		{
@@ -160,22 +160,22 @@ void LogIInputControllerState()
 
 			Serial.println();
 			Serial.print(F("Navigation\t"));
-			if (InputController.GetHome())
+			if (Pad.GetHome())
 			{
 				Serial.print(F("Home "));
 			}
-			if (InputController.GetAccept())
+			if (Pad.GetAccept())
 			{
 				Serial.print(F("Accept "));
 			}
-			if (InputController.GetReject())
+			if (Pad.GetReject())
 			{
 				Serial.print(F("Reject "));
 			}
 			Serial.println();
 
 			Serial.print(F("DPad\t"));
-			switch (InputController.DPad())
+			switch (Pad.DPad())
 			{
 			case DPadEnum::Up:
 				Serial.println(F("Up"));
@@ -196,7 +196,7 @@ void LogIInputControllerState()
 			}
 
 			Serial.print(F("Main Buttons\t"));
-			if (InputController.A())
+			if (Pad.A())
 			{
 				Serial.print(F("A  "));
 			}
@@ -205,7 +205,7 @@ void LogIInputControllerState()
 				Serial.print(F("__ "));
 			}
 
-			if (InputController.B())
+			if (Pad.B())
 			{
 				Serial.print(F("B  "));
 			}
@@ -214,7 +214,7 @@ void LogIInputControllerState()
 				Serial.print(F("__ "));
 			}
 
-			if (InputController.X())
+			if (Pad.X())
 			{
 				Serial.print(F("X  "));
 			}
@@ -223,7 +223,7 @@ void LogIInputControllerState()
 				Serial.print(F("__ "));
 			}
 
-			if (InputController.Y())
+			if (Pad.Y())
 			{
 				Serial.print(F("Y  "));
 			}
@@ -232,9 +232,9 @@ void LogIInputControllerState()
 				Serial.print(F("__ "));
 			}
 
-			if (InputController.FeatureL1())
+			if (Pad.FeatureL1())
 			{
-				if (InputController.L1())
+				if (Pad.L1())
 				{
 					Serial.print(F("L1 "));
 				}
@@ -244,9 +244,9 @@ void LogIInputControllerState()
 				}
 			}
 
-			if (InputController.FeatureR1())
+			if (Pad.FeatureR1())
 			{
-				if (InputController.R1())
+				if (Pad.R1())
 				{
 					Serial.print(F("R1 "));
 				}
@@ -256,9 +256,9 @@ void LogIInputControllerState()
 				}
 			}
 
-			if (InputController.FeatureL3())
+			if (Pad.FeatureL3())
 			{
-				if (InputController.L3())
+				if (Pad.L3())
 				{
 					Serial.print(F("L3 "));
 				}
@@ -268,9 +268,9 @@ void LogIInputControllerState()
 				}
 			}
 
-			if (InputController.FeatureR3())
+			if (Pad.FeatureR3())
 			{
-				if (InputController.R3())
+				if (Pad.R3())
 				{
 					Serial.print(F("R3 "));
 				}
@@ -282,49 +282,49 @@ void LogIInputControllerState()
 			Serial.println();
 
 			Serial.print(F("Menu Buttons\t"));
-			if (InputController.Start())
+			if (Pad.Start())
 			{
 				Serial.print(F("Start "));
 			}
-			if (InputController.Select())
+			if (Pad.Select())
 			{
 				Serial.print(F("Select "));
 			}
-			if (InputController.Home())
+			if (Pad.Home())
 			{
 				Serial.print(F("Home "));
 			}
-			if (InputController.Share())
+			if (Pad.Share())
 			{
 				Serial.print(F("Share "));
 			}
 			Serial.println();
 
 			Serial.print(F("Joy1(x,y)\t("));
-			Serial.print(InputController.Joy1X());
+			Serial.print(Pad.Joy1X());
 			Serial.print(',');
-			Serial.print(InputController.Joy1Y());
+			Serial.print(Pad.Joy1Y());
 			Serial.println(')');
 
-			if (InputController.FeatureJoy2())
+			if (Pad.FeatureJoy2())
 			{
 				Serial.print(F("Joy2(x,y)\t("));
-				Serial.print(InputController.Joy2X());
+				Serial.print(Pad.Joy2X());
 				Serial.print(',');
-				Serial.print(InputController.Joy2Y());
+				Serial.print(Pad.Joy2Y());
 				Serial.println(')');
 			}
 
-			if (InputController.FeatureL2())
+			if (Pad.FeatureL2())
 			{
 				Serial.print(F("L2\t"));
-				Serial.println(InputController.L2());
+				Serial.println(Pad.L2());
 			}
 
-			if (InputController.FeatureR2())
+			if (Pad.FeatureR2())
 			{
 				Serial.print(F("R2\t"));
-				Serial.println(InputController.R2());
+				Serial.println(Pad.R2());
 			}
 		}
 	}

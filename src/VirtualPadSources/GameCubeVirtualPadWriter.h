@@ -1,19 +1,19 @@
-// GameCubeInputController.h
+// GameCubeVirtualPadWriter.h
 
-#ifndef _GAMECUBE_INPUT_CONTROLLER_h
-#define _GAMECUBE_INPUT_CONTROLLER_h
+#ifndef _GAMECUBE_VIRTUAL_PAD_WRITER_h
+#define _GAMECUBE_VIRTUAL_PAD_WRITER_h
 
 #include <GameCubeController.h>
-#include "../WriteIInputController.h"
+#include "../WriteVirtualPad.h"
 #include "../Model/IInputMapper.h"
 
 template<int8_t Joy1XMin = -100, int8_t Joy1XMax = 100,
 	int8_t Joy1YMin = -100, int8_t Joy1YMax = 100,
 	int8_t Joy2XMin = -90, int8_t Joy2XMax = 90,
 	int8_t Joy2YMin = -90, int8_t Joy2YMax = 90,
-	uint8_t L2Min = 40, int8_t L2Max = 180,
-	uint8_t R2Min = 40, int8_t R2Max = 180>
-class GameCubeInputController : public WriteInputController
+	uint8_t L2Min = 40, int8_t L2Max = 100,
+	uint8_t R2Min = 40, int8_t R2Max = 100>
+class GameCubeVirtualPadWriter : public WriteVirtualPad
 {
 public:
 	static constexpr uint16_t Features = FeatureFlags::GetFlags<
@@ -30,7 +30,7 @@ private:
 	using ButtonsEnum = GameCubeController::ButtonsEnum;
 
 public:
-	GameCubeInputController() : WriteInputController(Features)
+	GameCubeVirtualPadWriter() : WriteVirtualPad(Features)
 	{}
 
 	void MapControllerData(GameCubeController::data_t& data)

@@ -1,15 +1,15 @@
-// Nintendo64InputController.h
+// Nintendo64VirtualPadWriter.h
 
-#ifndef _NINTENDO_64_INPUT_CONTROLLER_h
-#define _NINTENDO_64_INPUT_CONTROLLER_h
+#ifndef _NINTENDO_64_VIRTUAL_PAD_WRITER_h
+#define _NINTENDO_64_VIRTUAL_PAD_WRITER_h
 
 #include <Nintendo64Controller.h>
-#include "../WriteIInputController.h"
+#include "../WriteVirtualPad.h"
 #include "../Model/IInputMapper.h"
 
 
 /// <summary>
-/// Nintendo 64 to IInputController mapper.
+/// Nintendo 64 to VirtualPad mapper.
 /// C Buttons are mapped to (digital) Joy2.
 /// Z is mapped to (digital) L2.
 /// L and R are mapped to L1 and R1.
@@ -20,7 +20,7 @@
 /// <typeparam name="JoyXMax"></typeparam>
 template<int8_t JoyXMin = -80, int8_t JoyXMax = 80,
 	int8_t JoyYMin = -80, int8_t JoyYMax = 80>
-class Nintendo64InputController : public WriteInputController
+class Nintendo64VirtualPadWriter : public WriteVirtualPad
 {
 public:
 	static constexpr uint16_t Features = FeatureFlags::GetFlags<
@@ -33,7 +33,7 @@ private:
 	using ButtonsEnum = Nintendo64Controller::ButtonsEnum;
 
 public:
-	Nintendo64InputController() : WriteInputController(Features)
+	Nintendo64VirtualPadWriter() : WriteVirtualPad(Features)
 	{}
 
 	void MapControllerData(Nintendo64Controller::data_t& data)

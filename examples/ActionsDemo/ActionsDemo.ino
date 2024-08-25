@@ -1,7 +1,7 @@
 /*
 * Example Actions Demo.
-* Reads a source controller and translates to abstract IInputController.
-* Logs the IInputController actions to Serial.
+* Reads a source controller, translates and writes to VirtualPad.
+* Logs the IVirtualPad actions to Serial.
 * Uncomment the desired source controller to use.
 * Nintendo controllers depend on https://github.com/GitMoDu/JoybusOverUart
 */
@@ -14,8 +14,7 @@
 
 #define SERIAL_BAUD_RATE 115200
 
-#include <InputControllers.h>
-#include <InputTaskControllers.h>
+#include <VirtualPadSources.h>
 #include "Actions.h"
 
 static constexpr uint32_t UpdatePeriodMillis = 5;
@@ -26,18 +25,18 @@ static constexpr HardwareSerial* JoyBusSerial = &Serial3;
 #endif
 
 #if defined(DIRECT_CONTROLLER)
-DirectInputController InputController(A0, A1, 3, 4);
+DirectInputVirtualPadWriter Pad(A0, A1, 3, 4);
 #elif defined(USE_N64_CONTROLLER)
 #include <Nintendo64OverUart.h>
 Nintendo64OverUart JoyBusReader(JoyBusSerial);
 Nintendo64Controller::data_t ControllerData{};
-Nintendo64InputController<> InputController{};
+Nintendo64VirtualPadWriter<> Pad{};
 bool Polling = false;
 #elif defined(USE_GAMECUBE_CONTROLLER)
 #include <GameCubeOverUart.h>
 GameCubeOverUart JoyBusReader(JoyBusSerial);
 GameCubeController::data_t ControllerData{};
-GameCubeInputController<> InputController{};
+GameCubeVirtualPadWriter<> Pad{};
 #endif
 
 uint32_t LastUpdate = 0;
@@ -64,7 +63,7 @@ void setup()
 	Serial.print(F("Controller Demo..."));
 
 #if defined(DIRECT_CONTROLLER)
-	if (!InputController.Setup())
+	if (!Pad.Setup())
 	{
 		Halt();
 	}
@@ -86,7 +85,7 @@ void loop()
 	if (timestamp - LastUpdate >= UpdatePeriodMillis)
 	{
 		LastUpdate = timestamp;
-		InputController.Step();
+		Pad.Step();
 	}
 #elif defined(USE_N64_CONTROLLER)
 	if (timestamp - LastUpdate >= UpdatePeriodMillis)
@@ -95,20 +94,20 @@ void loop()
 		delay(1);
 		if (JoyBusReader.ReadControllerData(ControllerData))
 		{
-			InputController.MapControllerData(ControllerData);
+			Pad.MapControllerData(ControllerData);
 			LastUpdate = timestamp;
-			if (!InputController.Connected())
+			if (!Pad.Connected())
 			{
-				InputController.State.Connected = true;
+				Pad.SetConnected(true);
 			}
 		}
 		else if (timestamp - LastUpdate >= TimeOutPeriodMillis)
 		{
-			InputController.Clear();
+			Pad.Clear();
 		}
 	}
 #elif defined(USE_GAMECUBE_CONTROLLER)
-	if (InputController.Connected())
+	if (Pad.Connected())
 	{
 		if (timestamp - LastUpdate >= UpdatePeriodMillis)
 		{
@@ -116,12 +115,12 @@ void loop()
 			delay(1);
 			if (JoyBusReader.ReadControllerData(ControllerData))
 			{
-				InputController.MapControllerData(ControllerData);
+				Pad.MapControllerData(ControllerData);
 				LastUpdate = timestamp;
 			}
 			else if (timestamp - LastUpdate >= TimeOutPeriodMillis)
 			{
-				InputController.Clear();
+				Pad.Clear();
 			}
 		}
 	}
@@ -133,7 +132,7 @@ void loop()
 			delay(1);
 			if (JoyBusReader.ReadControllerData(ControllerData))
 			{
-				InputController.State.Connected = true;
+				Pad.SetConnected(true);
 				LastUpdate = timestamp - UpdatePeriodMillis;
 			}
 			else
@@ -145,9 +144,9 @@ void loop()
 #endif
 
 
-	if (InputController.Connected())
+	if (Pad.Connected())
 	{
-		ControllerActions.Parse(&InputController);
+		ControllerActions.Parse(&Pad);
 
 		if (ControllerActions.HasDownAction())
 		{

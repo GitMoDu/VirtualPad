@@ -1,17 +1,17 @@
-// IInputController.h
+// VirtualPad.h
 
-#ifndef _I_INPUT_CONTROLLER_h
-#define _I_INPUT_CONTROLLER_h
+#ifndef _VIRTUAL_PAD_h
+#define _VIRTUAL_PAD_h
 
 #include "Model/DigitalButtons.h"
 #include "Model/Features.h"
-#include "Model/controller_state.h"
+#include "Model/PadState.h"
 #include "ControllerParser/ButtonParser.h"
 #include "ControllerParser/AxisParser.h"
 #include "ControllerParser/JoystickParser.h"
 
 /// <summary>
-/// IInputController (read) interface.
+/// VirtualPad (read-only) interface.
 /// Use of button masks is slower than boolean fields, but uses way less RAM and speeds up state copies significantly.
 /// Modelled after RetroArch's RetroPad.
 ///			
@@ -49,10 +49,10 @@
 /// [L2]		[R2]
 /// 
 /// </summary>
-class IInputController
+class VirtualPad
 {
-public:
-	controller_state_t State{};
+protected:
+	PadState State{};
 
 private:
 	const uint16_t Features;
@@ -71,7 +71,7 @@ protected:
 	}
 
 public:
-	IInputController(const uint16_t features = 0) : Features(features)
+	VirtualPad(const uint16_t features = 0) : Features(features)
 	{}
 
 	/// <summary>
@@ -83,22 +83,22 @@ public:
 		State.Clear();
 	}
 
-	void CopyStateTo(controller_state_t& controllerState)
+	void CopyStateTo(PadState& controllerState)
 	{
 		State.CopyTo(controllerState);
 	}
 
-	void CopyStateTo(IInputController& controllerState)
+	void CopyStateTo(VirtualPad& controllerState)
 	{
 		State.CopyTo(controllerState.State);
 	}
 
-	void CopyStateFrom(const controller_state_t& controllerState)
+	void CopyStateFrom(const PadState& controllerState)
 	{
 		State.CopyFrom(controllerState);
 	}
 
-	void CopyStateFrom(const IInputController& controllerState)
+	void CopyStateFrom(const VirtualPad& controllerState)
 	{
 		State.CopyFrom(controllerState.State);
 	}
@@ -181,32 +181,32 @@ public:
 		return State.DPad == DPadEnum::Right || State.DPad == DPadEnum::DownRight || State.DPad == DPadEnum::UpRight;;
 	}
 
-	const int16_t Joy1X()
+	const int16_t Joy1X() const
 	{
 		return State.Joy1X;
 	}
 
-	const int16_t Joy1Y()
+	const int16_t Joy1Y() const
 	{
 		return State.Joy1Y;
 	}
 
-	const int16_t Joy2X()
+	const int16_t Joy2X() const
 	{
 		return State.Joy2X;
 	}
 
-	const int16_t Joy2Y()
+	const int16_t Joy2Y() const
 	{
 		return State.Joy2Y;
 	}
 
-	const uint16_t L2()
+	const uint16_t L2() const
 	{
 		return State.L2;
 	}
 
-	const uint16_t R2()
+	const uint16_t R2() const
 	{
 		return State.R2;
 	}
@@ -344,5 +344,14 @@ public:
 	{
 		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R3>(Features);
 	}
+};
+
+/// <summary>
+/// Interface for VirtualPad updates callback.
+/// </summary>
+class VirtualPadListener
+{
+public:
+	virtual void OnUpdate(VirtualPad* pad) {}
 };
 #endif

@@ -3,7 +3,7 @@
 #ifndef _ACTIONS_h
 #define _ACTIONS_h
 
-#include <IInputController.h>
+#include <VirtualPad.h>
 
 /// <summary>
 /// Maps all inputs to actions.
@@ -60,7 +60,7 @@ public:
 		return ActionDPad.HasAction() || ActionJoy1.HasAction() || ActionJoy2.HasAction() || ActionL2.ActionUp() || ActionR2.ActionUp();
 	}
 
-	const bool Parse(IInputController* inputController)
+	const bool Parse(VirtualPad* inputController)
 	{
 		if (inputController != nullptr
 			&& inputController->Connected())

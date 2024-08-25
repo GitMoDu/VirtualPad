@@ -1,12 +1,12 @@
-// DirectInputController.h
+// DirectInputVirtualPadWriter.h
 
-#ifndef _DIRECT_INPUT_CONTROLLER_h
-#define _DIRECT_INPUT_CONTROLLER_h
+#ifndef _DIRECT_INPUT_VIRTUAL_PAD_WRITER_h
+#define _DIRECT_INPUT_VIRTUAL_PAD_WRITER_h
 
-#include "../WriteIInputController.h"
+#include "../WriteVirtualPad.h"
 #include <Arduino.h>
 
-class DirectInputController : public WriteInputController
+class DirectInputVirtualPadWriter : public WriteVirtualPad
 {
 public:
 	static constexpr uint16_t Features = FeatureFlags::GetFlags();
@@ -18,8 +18,8 @@ private:
 	const uint8_t PinB;
 
 public:
-	DirectInputController(const uint8_t pinJoyX, const uint8_t pinJoyY, const uint8_t pinA, const uint8_t pinB)
-		: WriteInputController(Features)
+	DirectInputVirtualPadWriter(const uint8_t pinJoyX, const uint8_t pinJoyY, const uint8_t pinA, const uint8_t pinB)
+		: WriteVirtualPad(Features)
 		, PinJoyX(pinJoyX)
 		, PinJoyY(pinJoyY)
 		, PinA(pinA)

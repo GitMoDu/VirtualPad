@@ -1,6 +1,6 @@
 /*
-* Example IInputController Dispatcher Task.
-* Reads a source controller and translates to abstract IInputController.
+* Example VirtualPad Dispatcher Task.
+* Reads a source controller, translates and writes to VirtualPad.
 * Logs the controller actions to Serial.
 * Uncomment the desired source controller to use.
 * Nintendo controllers depend on https://github.com/GitMoDu/JoybusOverUart
@@ -18,12 +18,13 @@
 #define _TASK_SLEEP_ON_IDLE_RUN
 #include <TaskScheduler.h>
 
-#include <InputControllers.h>
-#include <InputTaskControllers.h>
-#include <Nintendo64ControllerReadTask.h>
-#include <GameCubeControllerReadTask.h>
-#include "DispatchLogger.h"
+#include <VirtualPadSources.h>
+#include <VirtualPadTaskSources.h>
+#include <VirtualPadDispatchTask.h>
 
+
+#include "DispatchLogger.h"
+#include "TemplateVirtualPadMapperTask.h"
 
 static constexpr uint32_t ReadPeriodMicros = 3000;
 static constexpr uint32_t UpdatePeriodMillis = 10;
@@ -38,10 +39,11 @@ Scheduler SchedulerBase{};
 
 #if defined(DIRECT_CONTROLLER)
 // Controller data and reader.
-DirectInputController InputController(PA0, PA1, 3, 4);
+DirectInputVirtualPadWriter Pad(PA0, PA1, 3, 4);
 // Updater task.
-DirectInputControllerTask ReadTask(&SchedulerBase, &InputController, ReadPeriodMicros / 1000);
+DirectInputVirtualPadWriterTask ReadTask(&SchedulerBase, &Pad, ReadPeriodMicros / 1000);
 #elif defined(USE_N64_CONTROLLER)
+#include <Nintendo64ControllerReadTask.h>
 // Raw Controller state.
 Nintendo64Controller::state_data_t ControllerState{};
 
@@ -49,12 +51,13 @@ Nintendo64Controller::state_data_t ControllerState{};
 Nintendo64ControllerReadTask ReadTask(&SchedulerBase, ControllerState, JoyBusSerial, ReadPeriodMicros);
 
 // Mapped controller data.
-using ControllerType = Nintendo64InputController<>;
-Nintendo64InputController<> InputController{};
+using ControllerType = Nintendo64VirtualPadWriter<>;
+Nintendo64VirtualPadWriter<> Pad{};
 
-// Nintendo64ControllerReadTask only updates ControllerState, requiring a separate task to map to the InputController.
-IInputTaskControllerMap<Nintendo64Controller::state_data_t, ControllerType> MapperTask(&SchedulerBase, ControllerState, InputController, ReadPeriodMicros / 1000);
+// Nintendo64ControllerReadTask only updates ControllerState, requiring a separate task to map to the Pad.
+TemplateVirtualPadMapperTask<Nintendo64Controller::state_data_t, ControllerType> MapperTask(SchedulerBase, ControllerState, Pad, ReadPeriodMicros / 1000);
 #elif defined(USE_GAMECUBE_CONTROLLER)
+#include <GameCubeControllerReadTask.h>
 // Raw Controller state.
 GameCubeController::state_data_t ControllerState{};
 
@@ -62,16 +65,16 @@ GameCubeController::state_data_t ControllerState{};
 GameCubeControllerReadTask ReadTask(&SchedulerBase, ControllerState, JoyBusSerial, ReadPeriodMicros);
 
 // Mapped controller data.
-GameCubeInputController<> InputController{};
-using ControllerType = GameCubeInputController<>;
+GameCubeVirtualPadWriter<> Pad{};
+using ControllerType = GameCubeVirtualPadWriter<>;
 
-// GameCubeControllerReadTask only updates ControllerState, requiring a separate task to map to the InputController.
-IInputTaskControllerMap<GameCubeController::state_data_t, ControllerType> MapperTask(&SchedulerBase, ControllerState, InputController, ReadPeriodMicros / 1000);
+// GameCubeControllerReadTask only updates ControllerState, requiring a separate task to map to the Pad.
+TemplateVirtualPadMapperTask<GameCubeController::state_data_t, ControllerType> MapperTask(SchedulerBase, ControllerState, Pad, ReadPeriodMicros / 1000);
 #endif
 
 
 // Dispatcher Task.
-IInputTaskControllerDispatch Dispatcher(&SchedulerBase, &InputController, UpdatePeriodMillis);
+VirtualPadDispatchTask Dispatcher(SchedulerBase, &Pad, UpdatePeriodMillis);
 
 // Dispatch Listener.
 DispatchLogger Logger(LogPeriodMillis);
@@ -95,7 +98,7 @@ void setup()
 	Serial.print(F("Dispatcher Demo..."));
 
 #if defined(DIRECT_CONTROLLER)
-	if (!InputController.Setup())
+	if (!Pad.Setup())
 	{
 		Halt();
 	}
@@ -107,7 +110,11 @@ void setup()
 
 	// Start source and mapper task.
 	ReadTask.Start();
+
+#if defined(DIRECT_CONTROLLER)
+#else
 	MapperTask.Start();
+#endif
 
 	Serial.println(F("Starting!"));
 
