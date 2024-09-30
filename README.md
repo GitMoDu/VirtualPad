@@ -21,7 +21,7 @@ Embedded virtual controller, inspired by RetroArch's RetroPad.
 - Arduino ADC+IO simple controller.
 - Nintendo64/GameCube controllers (JoybusOverUart https://github.com/GitMoDu/JoybusOverUart)
 
-## Task Based Beatures
+## Task Based Features
 Task features depend on Task Scheduler https://github.com/arkhipenko/TaskScheduler
 
 - ControllerMap: fixed period, template mapper from source to typed IInputController
