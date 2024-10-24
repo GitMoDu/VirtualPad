@@ -11,6 +11,7 @@
 #define DIRECT_CONTROLLER
 //#define USE_N64_CONTROLLER
 //#define USE_GAMECUBE_CONTROLLER
+//#define USE_MEGA_DRIVE_CONTROLLER
 
 #define SERIAL_BAUD_RATE 115200
 
@@ -25,7 +26,8 @@ static constexpr HardwareSerial* JoyBusSerial = &Serial3;
 #endif
 
 #if defined(DIRECT_CONTROLLER)
-DirectInputVirtualPadWriter Pad(A0, A1, 3, 4);
+//DirectInputVirtualPadWriter Pad(UINT8_MAX, UINT8_MAX, 4, 3);
+DirectInputVirtualPadWriter Pad(A0, A1, 4, 3, 5, 2, 8, 6, 7);
 #elif defined(USE_N64_CONTROLLER)
 #include <Nintendo64OverUart.h>
 Nintendo64OverUart JoyBusReader(JoyBusSerial);
@@ -37,6 +39,9 @@ bool Polling = false;
 GameCubeOverUart JoyBusReader(JoyBusSerial);
 GameCubeController::data_t ControllerData{};
 GameCubeVirtualPadWriter<> Pad{};
+#elif defined(USE_MEGA_DRIVE_CONTROLLER)
+enum class MegaDrivePin : uint8_t { Up = 2, Down = 3, InfoLeft = 4, InfoRight = 5, AB = 6, StartC = 7, Select = 8 };
+MegaDriveVirtualPadWriter<MegaDrivePin> Pad{};
 #endif
 
 uint32_t LastUpdate = 0;
@@ -65,10 +70,15 @@ void setup()
 	if (!Pad.Setup())
 	{
 		Halt();
-}
+	}
 #elif defined(USE_GAMECUBE_CONTROLLER) || defined(USE_N64_CONTROLLER)
 	JoyBusReader.Start();
+#elif defined(USE_MEGA_DRIVE_CONTROLLER)
+	Pad.Setup();
 #endif
+	Serial.println();
+
+	LogPadInfo();
 
 	Serial.println(F("Starting!"));
 
@@ -80,13 +90,12 @@ void loop()
 {
 	uint32_t timestamp = millis();
 
-
 #if defined(DIRECT_CONTROLLER)
 	if (timestamp - LastUpdate >= UpdatePeriodMillis)
 	{
 		LastUpdate = timestamp;
 		Pad.Step();
-}
+	}
 #elif defined(USE_N64_CONTROLLER)
 	if (timestamp - LastUpdate >= UpdatePeriodMillis)
 	{
@@ -145,9 +154,107 @@ void loop()
 			}
 		}
 	}
+#elif defined(USE_MEGA_DRIVE_CONTROLLER)
+	if (timestamp - LastUpdate >= UpdatePeriodMillis)
+	{
+		LastUpdate = timestamp;
+		Pad.Read();
+	}
 #endif
 
 	LogIInputControllerState();
+}
+
+void LogPadInfo()
+{
+	Serial.println(F("Pad Features: "));
+
+	if (Pad.FeatureStart() || Pad.FeatureSelect() || Pad.FeatureHome() || Pad.FeatureShare())
+	{
+		Serial.print(F("\tMenu Buttons: "));
+		if (Pad.FeatureStart()) { Serial.print(F("Start ")); }
+		if (Pad.FeatureSelect()) { Serial.print(F("Select ")); }
+		if (Pad.FeatureHome()) { Serial.print(F("Home ")); }
+		if (Pad.FeatureShare()) { Serial.print(F("Share ")); }
+		Serial.println();
+	}
+	else
+	{
+		Serial.println(F("\tNo Menu buttons"));
+	}
+
+	if (Pad.FeatureJoy1() || Pad.FeatureJoy2())
+	{
+		Serial.print(F("\tJoysticks: "));
+		if (Pad.FeatureJoy1()) { Serial.print(F("Joy1 ")); }
+		if (Pad.FeatureJoy2()) { Serial.print(F("Joy2 ")); }
+		Serial.println();
+	}
+	else
+	{
+		Serial.println(F("\tNo Joysticks"));
+	}
+
+	if (Pad.FeatureDPad())
+	{
+		Serial.print(F("\tDpad"));
+	}
+	else
+	{
+		Serial.print(F("\tNo DPad"));
+	}
+	Serial.println();
+
+	if (Pad.FeatureA() || Pad.FeatureB() || Pad.FeatureX() || Pad.FeatureY())
+	{
+		Serial.print(F("\tFace Buttons: "));
+		if (Pad.FeatureA()) { Serial.print(F("A ")); }
+		if (Pad.FeatureB()) { Serial.print(F("B ")); }
+		if (Pad.FeatureX()) { Serial.print(F("X ")); }
+		if (Pad.FeatureY()) { Serial.print(F("Y ")); }
+		Serial.println();
+	}
+	else
+	{
+		Serial.println(F("\tNo Face buttons"));
+	}
+
+	if (Pad.FeatureL2() || Pad.FeatureR2())
+	{
+		Serial.print(F("\tJoystick Buttons: "));
+		if (Pad.FeatureL3()) { Serial.print(F("L3 ")); }
+		if (Pad.FeatureR3()) { Serial.print(F("R3 ")); }
+		Serial.println();
+	}
+	else
+	{
+		Serial.println(F("\tNo Joystick buttons"));
+	}
+
+	if (Pad.FeatureL1() || Pad.FeatureR1())
+	{
+		Serial.print(F("\tShoulder buttons: "));
+		if (Pad.FeatureL1()) { Serial.print(F("L1 ")); }
+		if (Pad.FeatureR1()) { Serial.print(F("R1 ")); }
+		Serial.println();
+	}
+	else
+	{
+		Serial.println(F("\tNo Shoulder buttons"));
+	}
+
+	if (Pad.FeatureL2() || Pad.FeatureR2())
+	{
+		Serial.print(F("\tTriggers: "));
+		if (Pad.FeatureL2()) { Serial.print(F("L2 ")); }
+		if (Pad.FeatureR2()) { Serial.print(F("R2 ")); }
+		Serial.println();
+	}
+	else
+	{
+		Serial.println(F("\tNo triggers"));
+	}
+	Serial.println();
 }
 
 void LogIInputControllerState()
@@ -160,7 +267,7 @@ void LogIInputControllerState()
 
 			Serial.println();
 			Serial.print(F("Navigation\t"));
-			if (Pad.GetHome())
+			if (Pad.Home())
 			{
 				Serial.print(F("Home "));
 			}
@@ -180,56 +287,81 @@ void LogIInputControllerState()
 			case DPadEnum::Up:
 				Serial.println(F("Up"));
 				break;
-			case DPadEnum::Down:
-				Serial.println(F("Down"));
-				break;
-			case DPadEnum::Left:
-				Serial.println(F("Left"));
+			case DPadEnum::UpRight:
+				Serial.println(F("UpRight"));
 				break;
 			case DPadEnum::Right:
 				Serial.println(F("Right"));
 				break;
+			case DPadEnum::DownRight:
+				Serial.println(F("DownRight"));
+				break;
+			case DPadEnum::Down:
+				Serial.println(F("Down"));
+				break;
+			case DPadEnum::DownLeft:
+				Serial.println(F("DownLeft"));
+				break;
+			case DPadEnum::Left:
+				Serial.println(F("Left"));
+				break;
+			case DPadEnum::UpLeft:
+				Serial.println(F("UpLeft"));
+				break;
 			case DPadEnum::None:
-				Serial.println(F("Center"));
 			default:
+				Serial.println(F("Center"));
 				break;
 			}
 
 			Serial.print(F("Main Buttons\t"));
-			if (Pad.A())
+
+			if (Pad.FeatureA())
 			{
-				Serial.print(F("A  "));
-			}
-			else
-			{
-				Serial.print(F("__ "));
+				if (Pad.A())
+				{
+					Serial.print(F("A  "));
+				}
+				else
+				{
+					Serial.print(F("__ "));
+				}
 			}
 
-			if (Pad.B())
+			if (Pad.FeatureB())
 			{
-				Serial.print(F("B  "));
-			}
-			else
-			{
-				Serial.print(F("__ "));
-			}
-
-			if (Pad.X())
-			{
-				Serial.print(F("X  "));
-			}
-			else
-			{
-				Serial.print(F("__ "));
+				if (Pad.B())
+				{
+					Serial.print(F("B  "));
+				}
+				else
+				{
+					Serial.print(F("__ "));
+				}
 			}
 
-			if (Pad.Y())
+			if (Pad.FeatureX())
 			{
-				Serial.print(F("Y  "));
+				if (Pad.X())
+				{
+					Serial.print(F("X  "));
+				}
+				else
+				{
+					Serial.print(F("__ "));
+				}
 			}
-			else
+
+			if (Pad.FeatureY())
 			{
-				Serial.print(F("__ "));
+				if (Pad.Y())
+				{
+					Serial.print(F("Y  "));
+				}
+				else
+				{
+					Serial.print(F("__ "));
+				}
 			}
 
 			if (Pad.FeatureL1())
