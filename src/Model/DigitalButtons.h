@@ -5,17 +5,21 @@
 
 #include <stdint.h>
 
+/// <summary>
+/// Same codes as HID Gamepad.
+/// See hid_gamepad_hat_t reference.
+/// </summary>
 enum class DPadEnum : uint8_t
 {
 	None = 0,
 	Up = 1,
 	UpRight = 2,
-	UpLeft = 3,
-	Down = 4,
-	DownLeft = 5,
-	DownRight = 6,
+	Right = 3,
+	DownRight = 4,
+	Down = 5,
+	DownLeft = 6,
 	Left = 7,
-	Right = 8,
+	UpLeft = 8,
 	DPadEnumCount
 };
 
