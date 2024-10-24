@@ -55,7 +55,7 @@ protected:
 	PadState State{};
 
 private:
-	const uint16_t Features;
+	const uint32_t Features;
 
 protected:
 	template<const uint8_t bitIndex>
@@ -71,7 +71,7 @@ protected:
 	}
 
 public:
-	VirtualPad(const uint16_t features = 0) : Features(features)
+	VirtualPad(const uint32_t features = 0) : Features(features)
 	{}
 
 	/// <summary>
@@ -112,43 +112,51 @@ public:
 		return State.Connected;
 	}
 
-	const bool GetHome() const
-	{
-		if (FeatureHome())
-		{
-			return Home();
-		}
-		else
-		{
-			return Start();
-		}
-	}
-
 	const bool GetAccept() const
 	{
-		if (FeatureBAccept())
+		//TODO:
+		switch (NavigationEnum::AB)
 		{
+		case NavigationEnum::BA:
+		case NavigationEnum::BX:
+		case NavigationEnum::BY:
 			return B();
-		}
-		else
-		{
+			break;
+		case NavigationEnum::XA:
+		case NavigationEnum::XB:
+			return X();
+			break;
+		default:
+		case NavigationEnum::AB:
+		case NavigationEnum::AX:
+		case NavigationEnum::AY:
 			return A();
+			break;
 		}
 	}
 
 	const bool GetReject() const
 	{
-		if (FeatureYReject())
+		//TODO:
+		switch (NavigationEnum::AB)
 		{
-			return Y();
-		}
-		else if (FeatureBAccept())
-		{
+		case NavigationEnum::BA:
+		case NavigationEnum::XA:
 			return A();
-		}
-		else
-		{
+			break;
+		case NavigationEnum::BY:
+		case NavigationEnum::AY:
+			return Y();
+			break;
+		case NavigationEnum::BX:
+		case NavigationEnum::AX:
+			return X();
+			break;
+		default:
+		case NavigationEnum::XB:
+		case NavigationEnum::AB:
 			return B();
+			break;
 		}
 	}
 
@@ -178,7 +186,7 @@ public:
 
 	const bool DPadRight() const
 	{
-		return State.DPad == DPadEnum::Right || State.DPad == DPadEnum::DownRight || State.DPad == DPadEnum::UpRight;;
+		return State.DPad == DPadEnum::Right || State.DPad == DPadEnum::DownRight || State.DPad == DPadEnum::UpRight;
 	}
 
 	const int16_t Joy1X() const
@@ -275,34 +283,39 @@ public:
 	/// Features interface.
 	/// </summary>
 public:
+	const bool FeatureJoy1() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Joy1>(Features);
+	}
+
 	const bool FeatureJoy2() const
 	{
 		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Joy2>(Features);
 	}
 
-	const bool FeatureJoy2Digital() const
+	const bool FeatureA() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Joy2Digital>(Features);
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::A>(Features);
 	}
 
-	const bool FeatureL2R2Digital() const
+	const bool FeatureB() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L2R2Digital>(Features);
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::B>(Features);
 	}
 
-	const bool FeatureBAccept() const
+	const bool FeatureX() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::BAccept>(Features);
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::X>(Features);
 	}
 
-	const bool FeatureYReject() const
+	const bool FeatureY() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::YReject>(Features);
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Y>(Features);
 	}
 
-	const bool FeatureShare() const
+	const bool FeatureStart() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Share>(Features);
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Start>(Features);
 	}
 
 	const bool FeatureSelect() const
@@ -313,6 +326,11 @@ public:
 	const bool FeatureHome() const
 	{
 		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Home>(Features);
+	}
+
+	const bool FeatureShare() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Share>(Features);
 	}
 
 	const bool FeatureL1() const
@@ -343,6 +361,11 @@ public:
 	const bool FeatureR3() const
 	{
 		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R3>(Features);
+	}
+
+	const bool FeatureDPad() const
+	{
+		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::DPad>(Features);
 	}
 };
 
