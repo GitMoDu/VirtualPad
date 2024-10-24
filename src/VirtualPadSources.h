@@ -7,5 +7,6 @@
 #include <VirtualPadSources/DirectInputVirtualPadWriter.h>
 #include <VirtualPadSources/Nintendo64VirtualPadWriter.h>
 #include <VirtualPadSources/GameCubeVirtualPadWriter.h>
+#include <VirtualPadSources/MegaDriveVirtualPadWriter.h>
 
 #endif
