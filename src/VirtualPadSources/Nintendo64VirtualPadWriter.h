@@ -7,7 +7,6 @@
 #include "../WriteVirtualPad.h"
 #include "../Model/IInputMapper.h"
 
-
 /// <summary>
 /// Nintendo 64 to VirtualPad mapper.
 /// C Buttons are mapped to (digital) Joy2.
@@ -23,10 +22,13 @@ template<int8_t JoyXMin = -80, int8_t JoyXMax = 80,
 class Nintendo64VirtualPadWriter : public WriteVirtualPad
 {
 public:
-	static constexpr uint16_t Features = FeatureFlags::GetFlags<
-		FeaturesEnum::Joy2, FeaturesEnum::Joy2Digital,
+	static constexpr uint32_t Features = FeatureFlags::GetFlags<
+		FeaturesEnum::Joy2,
+		//FeaturesEnum::Joy2Digital,
 		FeaturesEnum::L1, FeaturesEnum::R1,
-		FeaturesEnum::L2, FeaturesEnum::L2R2Digital>();
+		FeaturesEnum::L2
+		//FeaturesEnum::L2R2Digital
+	>();
 
 private:
 	using JoystickMapper = IInputMapper::JoystickInt8<JoyXMin, JoyXMax, JoyYMin, JoyYMax>;
