@@ -14,23 +14,24 @@ Embedded virtual controller, inspired by RetroArch's RetroPad.
 ### WriteVirtualPad
 - Inherits from IVirtualPad
 - Write/Read API for controller state
-- IInputMapper helper to translate "analog" values (Joysticks and Sliders)
+- Support functions to translate "analog" values (Joysticks and Sliders)
 
 
 ## Supported Source Controllers
 - Arduino ADC+IO simple controller.
 - Nintendo64/GameCube controllers (JoybusOverUart https://github.com/GitMoDu/JoybusOverUart)
+- Mega Drive Controller Pad (74HC151)
 
 ## Task Based Features
 Task features depend on Task Scheduler https://github.com/arkhipenko/TaskScheduler
 
-- ControllerMap: fixed period, template mapper from source to typed IInputController
+- ControllerMap: fixed period, template mapper from source to VirtualPad
 - ControllerDispatch: fixed period notifier for dispatch interface
 - ControllerToX360: fixed period mapper from IInputController to USB-XBox360 controller
 
 ## Examples provided
 
-- Source Controller to IInputController
+- Source Controller to VirtualPad
 	- Arduino ADC+IO
 	- Nintendo64/GameCube
 
