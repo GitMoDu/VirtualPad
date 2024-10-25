@@ -7,10 +7,16 @@
 
 #include <WriteVirtualPad.h>
 
+/// <summary>
+/// Mega Drive Controller Pad (3 Button) reader and VirtualPad writer.
+/// A, B buttons mapped directly.
+/// C is mapped to R3.
+/// </summary>
+/// <typeparam name="ControllerPin">Pin mapping enum.</typeparam>
 template<typename ControllerPin>
 class MegaDriveVirtualPadWriter : public WriteVirtualPad
 {
-private:
+public:
 	static constexpr uint32_t Features = VirtualPadConfiguration::GetFeatureFlags<
 		FeaturesEnum::DPad,
 		FeaturesEnum::Start,

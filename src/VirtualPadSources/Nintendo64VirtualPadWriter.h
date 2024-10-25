@@ -23,12 +23,13 @@ class Nintendo64VirtualPadWriter : public WriteVirtualPad
 {
 public:
 	static constexpr uint32_t Features = FeatureFlags::GetFlags<
+		FeaturesEnum::DPad,
+		FeaturesEnum::Joy1,
 		FeaturesEnum::Joy2,
-		//FeaturesEnum::Joy2Digital,
+		FeaturesEnum::Start,
+		FeaturesEnum::A, FeaturesEnum::B,
 		FeaturesEnum::L1, FeaturesEnum::R1,
-		FeaturesEnum::L2
-		//FeaturesEnum::L2R2Digital
-	>();
+		FeaturesEnum::L2>();
 
 private:
 	using JoystickMapper = IInputMapper::JoystickInt8<JoyXMin, JoyXMax, JoyYMin, JoyYMax>;
