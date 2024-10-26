@@ -368,13 +368,4 @@ public:
 		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::DPad>(Features);
 	}
 };
-
-/// <summary>
-/// Interface for VirtualPad updates callback.
-/// </summary>
-class VirtualPadListener
-{
-public:
-	virtual void OnUpdate(VirtualPad* pad) {}
-};
 #endif
