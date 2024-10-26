@@ -1,7 +1,8 @@
 /*
 * Example Controller Demo.
 * Reads a source controller, translates and writes to VirtualPad.
-* Logs the VirtualPad state to Serial.
+* Logs the VirtualPad state and actions to Serial.
+* 
 * Uncomment the desired source controller to use.
 * Nintendo controllers depend on https://github.com/GitMoDu/JoybusOverUart
 */
@@ -16,13 +17,14 @@
 #define SERIAL_BAUD_RATE 115200
 
 #include <VirtualPadSources.h>
+#include "TestActions.h"
 
-static constexpr uint32_t UpdatePeriodMillis = 20;
-static constexpr uint32_t LogPeriodMillis = 50;
+static constexpr uint32_t UpdatePeriodMillis = 5;
+static constexpr uint32_t LogPeriodMillis = 100;
 static constexpr uint32_t LogLongPeriodMillis = 1000;
 static constexpr uint32_t TimeOutPeriodMillis = 100;
 #if defined(USE_N64_CONTROLLER) || defined(USE_GAMECUBE_CONTROLLER)
-static constexpr HardwareSerial* JoyBusSerial = &Serial3;
+static constexpr HardwareSerial* JoyBusSerial = &Serial2;
 #endif
 
 #if defined(DIRECT_CONTROLLER)
@@ -47,6 +49,7 @@ MegaDriveVirtualPadWriter<MegaDrivePin> Pad{};
 uint32_t LastUpdate = 0;
 uint32_t LastLog = 0;
 
+TestActions Actions{};
 
 void Halt()
 {
@@ -76,10 +79,9 @@ void setup()
 #elif defined(USE_MEGA_DRIVE_CONTROLLER)
 	Pad.Setup();
 #endif
+
 	Serial.println();
-
 	LogPadInfo();
-
 	Serial.println(F("Starting!"));
 
 	LastLog = millis() - LogPeriodMillis;
@@ -162,7 +164,21 @@ void loop()
 	}
 #endif
 
-	LogIInputControllerState();
+	if (Pad.Connected())
+	{
+		Actions.Parse(&Pad);
+
+		if (Actions.HasDownAction())
+		{
+			LogActions();
+		}
+	}
+	else
+	{
+		Actions.Clear();
+	}
+
+	LogPadState();
 }
 
 void LogPadInfo()
@@ -257,7 +273,7 @@ void LogPadInfo()
 	Serial.println();
 }
 
-void LogIInputControllerState()
+void LogPadState()
 {
 	if (Pad.Connected())
 	{
@@ -467,5 +483,96 @@ void LogIInputControllerState()
 			LastLog = millis();
 			Serial.println(F("No controller"));
 		}
+	}
+}
+
+void LogActions()
+{
+	if (Actions.A())
+		Serial.print(F("A\t"));
+	if (Actions.B())
+		Serial.print(F("B\t"));
+	if (Actions.X())
+		Serial.print(F("X\t"));
+	if (Actions.Y())
+		Serial.print(F("Y\t"));
+	if (Actions.L1())
+		Serial.print(F("L1\t"));
+	if (Actions.R1())
+		Serial.print(F("R1\t"));
+	if (Actions.L3())
+		Serial.print(F("L3\t"));
+	if (Actions.R3())
+		Serial.print(F("R3\t"));
+
+	if (Actions.Start())
+		Serial.print(F("Start\t"));
+	if (Actions.Select())
+		Serial.print(F("Select\t"));
+	if (Actions.Home())
+		Serial.print(F("Home\t"));
+	if (Actions.Share())
+		Serial.print(F("Share "));
+
+	if (Actions.L2())
+		Serial.print(F("L2\t"));
+	if (Actions.R2())
+		Serial.print(F("R2\t"));
+
+	if (Actions.DPad() != DPadEnum::None)
+	{
+		Serial.print(F("DPad::"));
+		PrintDPadActions(Actions.DPad());
+		Serial.print('\t');
+	}
+
+	if (Actions.Joy1() != DPadEnum::None)
+	{
+		Serial.print(F("Joy1::"));
+		PrintDPadActions(Actions.Joy1());
+		Serial.print('\t');
+	}
+
+	if (Actions.Joy2() != DPadEnum::None)
+	{
+		Serial.print(F("Joy2::"));
+		PrintDPadActions(Actions.Joy2());
+		Serial.print('\t');
+	}
+
+	Serial.println();
+}
+
+void PrintDPadActions(const DPadEnum dpad)
+{
+	switch (dpad)
+	{
+	case DPadEnum::Up:
+		Serial.print(F("Up"));
+		break;
+	case DPadEnum::UpRight:
+		Serial.print(F("UpRight"));
+		break;
+	case DPadEnum::Right:
+		Serial.print(F("Right"));
+		break;
+	case DPadEnum::DownRight:
+		Serial.print(F("DownRight"));
+		break;
+	case DPadEnum::Down:
+		Serial.print(F("Down"));
+		break;
+	case DPadEnum::DownLeft:
+		Serial.print(F("DownLeft"));
+		break;
+	case DPadEnum::Left:
+		Serial.print(F("Left"));
+		break;
+	case DPadEnum::UpLeft:
+		Serial.print(F("UpLeft"));
+		break;
+	case DPadEnum::None:
+	default:
+		break;
 	}
 }

@@ -1,14 +1,14 @@
-// Actions.h
+// TestActions.h
 
-#ifndef _ACTIONS_h
-#define _ACTIONS_h
+#ifndef _TEST_ACTIONS_h
+#define _TEST_ACTIONS_h
 
 #include <VirtualPad.h>
 
 /// <summary>
 /// Maps all inputs to actions.
 /// </summary>
-class Actions
+class TestActions
 {
 private:
 	ButtonParser::Action ActionMainButtons[(uint8_t)MainButtonEnum::MainButtonEnumCount]{};
@@ -23,7 +23,7 @@ private:
 	AxisParser::AxisAnalogToDigitalAction<> ActionR2;
 
 public:
-	Actions()
+	TestActions()
 	{}
 
 	void Clear()
