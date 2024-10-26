@@ -1,11 +1,11 @@
-// VirtualPad.h
+﻿// VirtualPad.h
 
 #ifndef _VIRTUAL_PAD_h
 #define _VIRTUAL_PAD_h
 
+#include "Model/virtual_pad_state_t.h"
 #include "Model/DigitalButtons.h"
 #include "Model/Features.h"
-#include "Model/PadState.h"
 #include "ControllerParser/ButtonParser.h"
 #include "ControllerParser/AxisParser.h"
 #include "ControllerParser/JoystickParser.h"
@@ -17,42 +17,41 @@
 ///			
 /// Menu Buttons:
 /// 
-///			[Guide]
-/// [Select]		[Start]
-///			[Share] 
+///	[Home]		[Share] 
+/// [Select]	[Start]
 ///	
 /// 
 /// DPad:
 /// 
-///		[?]
-///	[?]		[?]
-///		[?]				
+///	[↖]	[↑] [↗]
+///	[←]	 · 	[→]
+///	[↙]	[↓]	[↘]			
 /// 
 /// 
 /// Face Buttons:
 /// 
-///		[X]
-/// [Y]		[A]
-///		[B]
+///		[Y]
+/// [X]		[B]
+///		[A]
 /// 
 /// 
 /// Joysticks 1 and 2, with respective L3 and R3:
 /// 
-///		[?]				[?]
-///	[?]	[3] [?]		[?]	[3] [?]
-///		[?]				[?]
+///	[↖]	[↑]	[↗]		[↖]	[↑]	[↗]
+///	[←]	L3	[→]		[←]	 R3	[→]
+///	[↙]	[↓]	[↘]		[↙]	[↓]	[↘]	
 /// 
 /// 
 /// Digital and Analog Triggers:
 /// 
 /// [L1]		[R1]
 /// [L2]		[R2]
-/// 
+///
 /// </summary>
 class VirtualPad
 {
 protected:
-	PadState State{};
+	virtual_pad_state_t State{};
 
 private:
 	const uint32_t Features;
@@ -83,7 +82,7 @@ public:
 		State.Clear();
 	}
 
-	void CopyStateTo(PadState& controllerState)
+	void CopyStateTo(virtual_pad_state_t& controllerState)
 	{
 		State.CopyTo(controllerState);
 	}
@@ -93,7 +92,7 @@ public:
 		State.CopyTo(controllerState.State);
 	}
 
-	void CopyStateFrom(const PadState& controllerState)
+	void CopyStateFrom(const virtual_pad_state_t& controllerState)
 	{
 		State.CopyFrom(controllerState);
 	}

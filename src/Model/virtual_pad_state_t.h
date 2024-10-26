@@ -4,45 +4,12 @@
 #define _PAD_STATE_h
 
 #include <stdint.h>
+#include "Model/DigitalButtons.h"
 
 /// <summary>
-/// Abstract controller state. 
-/// Modelled after RetroArch's RetroPad.
-///			
-/// Menu Buttons:
-/// 
-///	[Home]		[Share] 
-/// [Select]	[Start]
-///	
-/// 
-/// DPad:
-/// 
-///	[↖]	[↑] [↗]
-///	[←]	 · 	[→]
-///	[↙]	[↓]	[↘]			
-/// 
-/// 
-/// Face Buttons:
-/// 
-///		[Y]
-/// [X]		[B]
-///		[A]
-/// 
-/// 
-/// Joysticks 1 and 2, with respective L3 and R3:
-/// 
-///	[↖]	[↑]	[↗]		[↖]	[↑]	[↗]
-///	[←]	L3	[→]		[←]	 R3	[→]
-///	[↙]	[↓]	[↘]		[↙]	[↓]	[↘]	
-/// 
-/// 
-/// Digital and Analog Triggers:
-/// 
-/// [L1]		[R1]
-/// [L2]		[R2]
-/// 
+/// Virtual controller state data struct.
 /// </summary>
-struct PadState
+struct virtual_pad_state_t
 {
 	int16_t Joy1X = 0;
 	int16_t Joy1Y = 0;
@@ -81,7 +48,7 @@ struct PadState
 		Connected = false;
 	}
 
-	void CopyTo(PadState& controllerState)
+	void CopyTo(virtual_pad_state_t& controllerState)
 	{
 		controllerState.Joy1X = Joy1X;
 		controllerState.Joy1Y = Joy1Y;
@@ -97,7 +64,7 @@ struct PadState
 		controllerState.Connected = Connected;
 	}
 
-	void CopyFrom(const PadState& controllerState)
+	void CopyFrom(const virtual_pad_state_t& controllerState)
 	{
 		Joy1X = controllerState.Joy1X;
 		Joy1Y = controllerState.Joy1Y;
