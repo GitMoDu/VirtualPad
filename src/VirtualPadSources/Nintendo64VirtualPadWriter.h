@@ -22,21 +22,18 @@ template<int8_t JoyXMin = -80, int8_t JoyXMax = 80,
 class Nintendo64VirtualPadWriter : public WriteVirtualPad
 {
 public:
-	static constexpr uint32_t Features = FeatureFlags::GetFlags<
-		FeaturesEnum::DPad,
-		FeaturesEnum::Joy1,
-		FeaturesEnum::Joy2,
-		FeaturesEnum::Start,
-		FeaturesEnum::A, FeaturesEnum::B,
-		FeaturesEnum::L1, FeaturesEnum::R1,
-		FeaturesEnum::L2>();
+	static constexpr uint32_t ConfigurationCode =
+		VirtualPadConfiguration::GetConfigurationCode(
+			VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::DPad, FeaturesEnum::Joy1, FeaturesEnum::Joy2, FeaturesEnum::Start, FeaturesEnum::A, FeaturesEnum::B, FeaturesEnum::L1, FeaturesEnum::R1, FeaturesEnum::L2>(),
+			VirtualPadConfiguration::GetPropertyFlags<PropertiesEnum::Joy2Digital, PropertiesEnum::L2R2Digital>(),
+			NavigationEnum::AB);
 
 private:
 	using JoystickMapper = IInputMapper::JoystickInt8<JoyXMin, JoyXMax, JoyYMin, JoyYMax>;
 	using ButtonsEnum = Nintendo64Controller::ButtonsEnum;
 
 public:
-	Nintendo64VirtualPadWriter() : WriteVirtualPad(Features)
+	Nintendo64VirtualPadWriter() : WriteVirtualPad(ConfigurationCode)
 	{}
 
 	void MapControllerData(Nintendo64Controller::data_t& data)

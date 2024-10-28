@@ -34,15 +34,18 @@ template<int8_t Joy1XMin = -100, int8_t Joy1XMax = 100,
 class GameCubeVirtualPadWriter : public WriteVirtualPad
 {
 public:
-	static constexpr uint16_t Features = FeatureFlags::GetFlags<
-		FeaturesEnum::DPad,
-		FeaturesEnum::Joy1,
-		FeaturesEnum::Joy2,
-		FeaturesEnum::Start,
-		FeaturesEnum::A, FeaturesEnum::B, FeaturesEnum::X, FeaturesEnum::Y,
-		FeaturesEnum::L1, FeaturesEnum::R1,
-		FeaturesEnum::L2, FeaturesEnum::R2,
-		FeaturesEnum::R3>();
+	static constexpr uint32_t ConfigurationCode =
+		VirtualPadConfiguration::GetConfigurationCode(
+			VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::DPad,
+			FeaturesEnum::Joy1,
+			FeaturesEnum::Joy2,
+			FeaturesEnum::Start,
+			FeaturesEnum::A, FeaturesEnum::B, FeaturesEnum::X, FeaturesEnum::Y,
+			FeaturesEnum::L1, FeaturesEnum::R1,
+			FeaturesEnum::L2, FeaturesEnum::R2,
+			FeaturesEnum::R3>(),
+			VirtualPadConfiguration::NoProperties,
+			NavigationEnum::AB);
 
 private:
 	using Joystick1Mapper = IInputMapper::JoystickInt8<Joy1XMin, Joy1XMax, Joy1YMin, Joy1YMax>;
@@ -52,7 +55,7 @@ private:
 	using ButtonsEnum = GameCubeController::ButtonsEnum;
 
 public:
-	GameCubeVirtualPadWriter() : WriteVirtualPad(Features)
+	GameCubeVirtualPadWriter() : WriteVirtualPad(ConfigurationCode)
 	{}
 
 	void MapControllerData(GameCubeController::data_t& data)

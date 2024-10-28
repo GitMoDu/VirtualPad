@@ -11,8 +11,8 @@
 class WriteVirtualPad : public VirtualPad
 {
 public:
-	WriteVirtualPad(const uint16_t features = 0)
-		: VirtualPad(features)
+	WriteVirtualPad(const uint32_t configurationCode = 0)
+		: VirtualPad(configurationCode)
 	{}
 
 public:

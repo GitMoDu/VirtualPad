@@ -1,7 +1,7 @@
-// PadState.h
+// virtual_pad_state_t.h
 
-#ifndef _PAD_STATE_h
-#define _PAD_STATE_h
+#ifndef _VIRTUAL_PAD_STATE_h
+#define _VIRTUAL_PAD_STATE_h
 
 #include <stdint.h>
 #include "Model/DigitalButtons.h"

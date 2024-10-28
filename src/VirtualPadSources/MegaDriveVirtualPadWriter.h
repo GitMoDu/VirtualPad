@@ -17,18 +17,21 @@ template<typename ControllerPin>
 class MegaDriveVirtualPadWriter : public WriteVirtualPad
 {
 public:
-	static constexpr uint32_t Features = VirtualPadConfiguration::GetFeatureFlags<
-		FeaturesEnum::DPad,
-		FeaturesEnum::Start,
-		FeaturesEnum::A, FeaturesEnum::B,
-		FeaturesEnum::R3>();
+	static constexpr uint32_t ConfigurationCode =
+		VirtualPadConfiguration::GetConfigurationCode(
+			VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::DPad,
+			FeaturesEnum::Start,
+			FeaturesEnum::A, FeaturesEnum::B,
+			FeaturesEnum::R3>(),
+			VirtualPadConfiguration::NoProperties,
+			NavigationEnum::AB);
 
 protected:
 	static constexpr uint8_t PIN_INPUT_MODE = INPUT;
 
 public:
 	MegaDriveVirtualPadWriter()
-		: WriteVirtualPad(Features)
+		: WriteVirtualPad(ConfigurationCode)
 	{}
 
 	void Setup()

@@ -54,7 +54,7 @@ protected:
 	virtual_pad_state_t State{};
 
 private:
-	const uint32_t Features;
+	const uint32_t ConfigurationCode;
 
 protected:
 	template<const uint8_t bitIndex>
@@ -70,13 +70,18 @@ protected:
 	}
 
 public:
-	VirtualPad(const uint32_t features = 0) : Features(features)
+	VirtualPad(const uint32_t configurationCode = 0) : ConfigurationCode(configurationCode)
 	{}
 
 	/// <summary>
 	/// State interface.
 	/// </summary>
 public:
+	const bool Connected() const
+	{
+		return State.Connected;
+	}
+
 	void Clear()
 	{
 		State.Clear();
@@ -103,18 +108,12 @@ public:
 	}
 
 	/// <summary>
-	/// Navigation interface, based on declared features.
+	/// Navigation interface, based on configuration code.
 	/// </summary>
 public:
-	const bool Connected() const
-	{
-		return State.Connected;
-	}
-
 	const bool GetAccept() const
 	{
-		//TODO:
-		switch (NavigationEnum::AB)
+		switch (VirtualPadConfiguration::GetNavigation(ConfigurationCode))
 		{
 		case NavigationEnum::BA:
 		case NavigationEnum::BX:
@@ -136,8 +135,7 @@ public:
 
 	const bool GetReject() const
 	{
-		//TODO:
-		switch (NavigationEnum::AB)
+		switch (VirtualPadConfiguration::GetNavigation(ConfigurationCode))
 		{
 		case NavigationEnum::BA:
 		case NavigationEnum::XA:
@@ -279,92 +277,111 @@ public:
 	}
 
 	/// <summary>
-	/// Features interface.
+	/// Features interface, based on configuration code.
 	/// </summary>
 public:
 	const bool FeatureJoy1() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Joy1>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::Joy1>(ConfigurationCode);
 	}
 
 	const bool FeatureJoy2() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Joy2>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::Joy2>(ConfigurationCode);
 	}
 
 	const bool FeatureA() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::A>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::A>(ConfigurationCode);
 	}
 
 	const bool FeatureB() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::B>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::B>(ConfigurationCode);
 	}
 
 	const bool FeatureX() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::X>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::X>(ConfigurationCode);
 	}
 
 	const bool FeatureY() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Y>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::Y>(ConfigurationCode);
 	}
 
 	const bool FeatureStart() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Start>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::Start>(ConfigurationCode);
 	}
 
 	const bool FeatureSelect() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Select>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::Select>(ConfigurationCode);
 	}
 
 	const bool FeatureHome() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Home>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::Home>(ConfigurationCode);
 	}
 
 	const bool FeatureShare() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::Share>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::Share>(ConfigurationCode);
 	}
 
 	const bool FeatureL1() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L1>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::L1>(ConfigurationCode);
 	}
 
 	const bool FeatureR1() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R1>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::R1>(ConfigurationCode);
 	}
 
 	const bool FeatureL2() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L2>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::L2>(ConfigurationCode);
 	}
 
 	const bool FeatureR2() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R2>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::R2>(ConfigurationCode);
 	}
 
 	const bool FeatureL3() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::L3>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::L3>(ConfigurationCode);
 	}
 
 	const bool FeatureR3() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::R3>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::R3>(ConfigurationCode);
 	}
 
 	const bool FeatureDPad() const
 	{
-		return FeatureFlags::GetFeatureEnabled<FeaturesEnum::DPad>(Features);
+		return VirtualPadConfiguration::GetFeature<FeaturesEnum::DPad>(ConfigurationCode);
+	}
+
+	/// <summary>
+	/// Properties interface, based on configuration code.
+	/// </summary>
+public:
+	const bool PropertyJoy1Digital() const
+	{
+		return VirtualPadConfiguration::GetProperty<PropertiesEnum::Joy1Digital>(ConfigurationCode);
+	}
+
+	const bool PropertyJoy2Digital() const
+	{
+		return VirtualPadConfiguration::GetProperty<PropertiesEnum::Joy2Digital>(ConfigurationCode);
+	}
+
+	const bool PropertyL2R2Digital() const
+	{
+		return VirtualPadConfiguration::GetProperty<PropertiesEnum::L2R2Digital>(ConfigurationCode);
 	}
 };
 #endif

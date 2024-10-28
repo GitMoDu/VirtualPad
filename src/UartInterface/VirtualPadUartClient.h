@@ -27,7 +27,7 @@ private:
 	VirtualPad& Pad;
 
 private:
-	PadState RawState{};
+	virtual_pad_state_t RawState{};
 
 private:
 	uint32_t LastUpdate = 0;
@@ -109,11 +109,11 @@ public:
 		switch ((MessageEnum)header)
 		{
 		case MessageEnum::UpdateState:
-			if (payloadSize == sizeof(PadState))
+			if (payloadSize == sizeof(virtual_pad_state_t))
 			{
 				LastUpdate = millis();
 
-				memcpy((uint8_t*)&RawState, payload, sizeof(PadState));
+				memcpy((uint8_t*)&RawState, payload, sizeof(virtual_pad_state_t));
 				Pad.CopyStateFrom(RawState);
 			}
 			break;

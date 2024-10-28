@@ -30,7 +30,7 @@ private:
 	VirtualPad& Pad;
 
 private:
-	PadState RawState{};
+	virtual_pad_state_t RawState{};
 
 	uint32_t LastCommandReceived = 0;
 

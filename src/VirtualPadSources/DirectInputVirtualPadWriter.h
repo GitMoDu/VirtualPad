@@ -26,14 +26,14 @@ private:
 		const uint8_t pinStart,
 		const uint8_t pinSelect)
 	{
-		return (FeatureFlags::GetFlags<FeaturesEnum::Joy1>() * (IsPinActive(pinJoyX) && IsPinActive(pinJoyY)))
-			| (FeatureFlags::GetFlags<FeaturesEnum::A>() * IsPinActive(pinA))
-			| (FeatureFlags::GetFlags<FeaturesEnum::B>() * IsPinActive(pinB))
-			| (FeatureFlags::GetFlags<FeaturesEnum::X>() * IsPinActive(pinX))
-			| (FeatureFlags::GetFlags<FeaturesEnum::Y>() * IsPinActive(pinY))
-			| (FeatureFlags::GetFlags<FeaturesEnum::L3>() * IsPinActive(pinL3))
-			| (FeatureFlags::GetFlags<FeaturesEnum::Start>() * IsPinActive(pinStart))
-			| (FeatureFlags::GetFlags<FeaturesEnum::Select>() * IsPinActive(pinSelect))
+		return (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::Joy1>() * (IsPinActive(pinJoyX) && IsPinActive(pinJoyY)))
+			| (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::A>() * IsPinActive(pinA))
+			| (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::B>() * IsPinActive(pinB))
+			| (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::X>() * IsPinActive(pinX))
+			| (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::Y>() * IsPinActive(pinY))
+			| (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::L3>() * IsPinActive(pinL3))
+			| (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::Start>() * IsPinActive(pinStart))
+			| (VirtualPadConfiguration::GetFeatureFlags<FeaturesEnum::Select>() * IsPinActive(pinSelect))
 			;
 	}
 
@@ -56,7 +56,10 @@ public:
 		const uint8_t pinStart = UINT8_MAX,
 		const uint8_t pinSelect = UINT8_MAX
 	)
-		: WriteVirtualPad(GetFeatures(pinJoyX, pinJoyY, pinA, pinB, pinX, pinY, pinL3, pinStart, pinSelect))
+		: WriteVirtualPad(VirtualPadConfiguration::GetConfigurationCode(
+			GetFeatures(pinJoyX, pinJoyY, pinA, pinB, pinX, pinY, pinL3, pinStart, pinSelect),
+			VirtualPadConfiguration::NoProperties,
+			NavigationEnum::AB))
 		, PinJoyX(pinJoyX)
 		, PinJoyY(pinJoyY)
 		, PinA(pinA)
