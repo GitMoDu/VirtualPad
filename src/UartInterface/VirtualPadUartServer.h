@@ -13,15 +13,13 @@
 /// Depends on https://github.com/GitMoDu/UartInterface
 /// </summary>
 /// <typeparam name="SerialType"></typeparam>
-template<typename SerialType>
+template<typename SerialType,
+	uint32_t UpdatePeriod = 10,
+	uint32_t UpdateLongPeriod = 50>
 class VirtualPadUartServer : private TS::Task, public virtual UartInterfaceListener
 {
 private:
 	using MessageEnum = VirtualPadUartInterface::MessageEnum;
-
-private:
-	static constexpr uint32_t UpdatePeriod = 5;
-	static constexpr uint32_t UpdateLongPeriod = 50;
 
 private:
 	UartInterfaceTask<SerialType, VirtualPadUartInterface::UartDefinitions> Interface;
@@ -67,24 +65,35 @@ public:
 
 	virtual bool Callback() final
 	{
-		Pad.CopyStateTo(RawState);
-
-		if (RawState.Connected)
+		if (Interface.IsSerialConnected())
 		{
-			TS::Task::delay(UpdatePeriod);
+			Pad.CopyStateTo(RawState);
+
+			if (RawState.Connected)
+			{
+				TS::Task::delay(UpdatePeriod);
+			}
+			else
+			{
+				TS::Task::delay(UpdateLongPeriod);
+			}
+
+			Interface.SendMessage((uint8_t)MessageEnum::UpdateState, (uint8_t*)&RawState, sizeof(virtual_pad_state_t));
 		}
 		else
 		{
 			TS::Task::delay(UpdateLongPeriod);
 		}
 
-		Interface.SendMessage((uint8_t)MessageEnum::UpdateState, (uint8_t*)&RawState, sizeof(PadState));
-
 		return true;
 	}
 
 	void OnUartStateChange(const bool connected) final
 	{
+		if (connected)
+		{
+			TS::Task::enableDelayed(0);
+		}
 	}
 
 	void OnMessageReceived(const uint8_t header) final
