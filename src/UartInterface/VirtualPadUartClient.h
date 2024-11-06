@@ -7,21 +7,22 @@
 #include <TSchedulerDeclarations.hpp>
 
 #include <UartInterfaceTask.h>
+#include <VirtualPad.h>
 
 /// <summary>
 /// Listens to UART updates for VirtualPad.
 /// Depends on https://github.com/GitMoDu/UartInterface
 /// </summary>
 /// <typeparam name="SerialType"></typeparam>
-template<typename SerialType>
+template<typename SerialType,
+	typename UartDefinitions = UartInterface::ExampleUartDefinitions>
 class VirtualPadClientTask : private TS::Task, public virtual UartInterfaceListener
 {
 private:
 	using MessageEnum = VirtualPadUartInterface::MessageEnum;
 
-
 private:
-	UartInterfaceTask<SerialType, VirtualPadUartInterface::UartDefinitions> Interface;
+	UartInterfaceTask<SerialType, UartDefinitions> Interface;
 
 private:
 	VirtualPad& Pad;

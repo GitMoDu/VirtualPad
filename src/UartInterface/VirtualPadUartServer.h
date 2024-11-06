@@ -14,6 +14,7 @@
 /// </summary>
 /// <typeparam name="SerialType"></typeparam>
 template<typename SerialType,
+	typename UartDefinitions = UartInterface::ExampleUartDefinitions,
 	uint32_t UpdatePeriod = 10,
 	uint32_t UpdateLongPeriod = 50>
 class VirtualPadUartServer : private TS::Task, public virtual UartInterfaceListener
@@ -22,7 +23,7 @@ private:
 	using MessageEnum = VirtualPadUartInterface::MessageEnum;
 
 private:
-	UartInterfaceTask<SerialType, VirtualPadUartInterface::UartDefinitions> Interface;
+	UartInterfaceTask<SerialType, UartDefinitions> Interface;
 
 private:
 	VirtualPad& Pad;
