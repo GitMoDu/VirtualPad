@@ -27,6 +27,8 @@ private:
 private:
 	VirtualPad& Pad;
 
+	Print* SerialLogger;
+
 private:
 	virtual_pad_state_t RawState{};
 
@@ -40,12 +42,14 @@ private:
 public:
 	VirtualPadClientTask(TS::Scheduler& scheduler,
 		SerialType& serialInstance,
-		VirtualPad& virtualPad)
+		VirtualPad& virtualPad,
+		Print* serialLogger = nullptr)
 		: UartInterfaceListener()
 		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
 		, Interface(scheduler, serialInstance, this,
-			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
+			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey), serialLogger)
 		, Pad(virtualPad)
+		, SerialLogger(serialLogger)
 	{}
 
 	/// <summary>
