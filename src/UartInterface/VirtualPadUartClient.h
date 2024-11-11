@@ -9,6 +9,12 @@
 #include <UartInterfaceTask.h>
 #include <VirtualPad.h>
 
+class VirtualPadClientListener
+{
+public:
+	virtual void OnPadUpdate(VirtualPad& pad) {};
+};
+
 /// <summary>
 /// Listens to UART updates for VirtualPad.
 /// Depends on https://github.com/GitMoDu/UartInterface
@@ -27,6 +33,8 @@ private:
 private:
 	VirtualPad& Pad;
 
+private:
+	VirtualPadClientListener* Listener;
 	Print* SerialLogger;
 
 private:
@@ -43,12 +51,14 @@ public:
 	VirtualPadClientTask(TS::Scheduler& scheduler,
 		SerialType& serialInstance,
 		VirtualPad& virtualPad,
+		VirtualPadClientListener* listener = nullptr,
 		Print* serialLogger = nullptr)
 		: UartInterfaceListener()
 		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
 		, Interface(scheduler, serialInstance, this,
 			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
 		, Pad(virtualPad)
+		, Listener(listener)
 		, SerialLogger(serialLogger)
 	{}
 
@@ -78,6 +88,10 @@ public:
 			&& ((millis() - LastUpdate) > OperatorTimeoutPeriod))
 		{
 			Pad.Clear();
+			if (Listener != nullptr)
+			{
+				Listener->OnPadUpdate(Pad);
+			}
 			TS::Task::delay(OperatorCheckPeriod);
 		}
 		else if (FeedbackPending)
@@ -103,6 +117,10 @@ public:
 			&& Pad.Connected())
 		{
 			Pad.Clear();
+			if (Listener != nullptr)
+			{
+				Listener->OnPadUpdate(Pad);
+			}
 		}
 	}
 
@@ -168,6 +186,10 @@ public:
 
 				memcpy((uint8_t*)&RawState, payload, sizeof(virtual_pad_state_t));
 				Pad.CopyStateFrom(RawState);
+				if (Listener != nullptr)
+				{
+					Listener->OnPadUpdate(Pad);
+				}
 			}
 			break;
 		default:
