@@ -14,7 +14,7 @@
 /// </summary>
 /// <typeparam name="SerialType"></typeparam>
 template<typename SerialType,
-	typename UartDefinitions = UartInterface::ExampleUartDefinitions,
+	typename UartDefinitions = UartInterface::TemplateUartDefinitions<>,
 	uint32_t UpdatePeriod = 10,
 	uint32_t UpdateLongPeriod = 50>
 class VirtualPadUartServer : private TS::Task, public virtual UartInterfaceListener
@@ -97,11 +97,11 @@ public:
 		}
 	}
 
-	void OnMessageReceived(const uint8_t header) final
+	void OnUartRx(const uint8_t header) final
 	{
 	}
 
-	void OnMessageReceived(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize)
+	void OnUartRx(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize)
 	{
 		switch ((MessageEnum)header)
 		{

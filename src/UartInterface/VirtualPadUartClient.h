@@ -15,8 +15,8 @@
 /// </summary>
 /// <typeparam name="SerialType"></typeparam>
 template<typename SerialType,
-	typename UartDefinitions = UartInterface::ExampleUartDefinitions>
-class VirtualPadClientTask : private TS::Task, public virtual UartInterfaceListener
+	typename UartDefinitions = UartInterface::TemplateUartDefinitions<>>
+	class VirtualPadClientTask : private TS::Task, public virtual UartInterfaceListener
 {
 private:
 	using MessageEnum = VirtualPadUartInterface::MessageEnum;
@@ -47,7 +47,7 @@ public:
 		: UartInterfaceListener()
 		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
 		, Interface(scheduler, serialInstance, this,
-			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey), serialLogger)
+			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
 		, Pad(virtualPad)
 		, SerialLogger(serialLogger)
 	{}
@@ -75,7 +75,7 @@ public:
 	virtual bool Callback() final
 	{
 		if (Pad.Connected()
-			&& millis() - LastUpdate > OperatorTimeoutPeriod)
+			&& ((millis() - LastUpdate) > OperatorTimeoutPeriod))
 		{
 			Pad.Clear();
 			TS::Task::delay(OperatorCheckPeriod);
@@ -106,10 +106,58 @@ public:
 		}
 	}
 
-	void OnMessageReceived(const uint8_t header) final
+	virtual void OnUartTxError(const TxErrorEnum error) final
+	{
+		if (SerialLogger)
+		{
+			switch (error)
+			{
+			case UartInterfaceListener::TxErrorEnum::StartTimeout:
+				SerialLogger->println(F("Tx Start Timeout"));
+				break;
+			case UartInterfaceListener::TxErrorEnum::DataTimeout:
+				SerialLogger->println(F("Tx Data Timeout"));
+				break;
+			case UartInterfaceListener::TxErrorEnum::EndTimeout:
+				SerialLogger->println(F("Tx End Timeout"));
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	virtual void OnUartRxError(const RxErrorEnum error) final
+	{
+		if (SerialLogger)
+		{
+			switch (error)
+			{
+			case RxErrorEnum::StartTimeout:
+				SerialLogger->println(F("Rx Start Timeout"));
+				break;
+			case RxErrorEnum::Crc:
+				SerialLogger->println(F("Rx Crc Mismatch"));
+				break;
+			case RxErrorEnum::TooShort:
+				SerialLogger->println(F("Rx Too Short"));
+				break;
+			case RxErrorEnum::TooLong:
+				SerialLogger->println(F("Rx TooLong"));
+				break;
+			case RxErrorEnum::EndTimeout:
+				SerialLogger->println(F("Rx End Timeout"));
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	void OnUartRx(const uint8_t header) final
 	{}
 
-	void OnMessageReceived(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize)
+	void OnUartRx(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize) final
 	{
 		switch ((MessageEnum)header)
 		{
