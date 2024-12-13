@@ -8,5 +8,6 @@
 #include <VirtualPadSources/Nintendo64VirtualPadWriter.h>
 #include <VirtualPadSources/GameCubeVirtualPadWriter.h>
 #include <VirtualPadSources/MegaDriveVirtualPadWriter.h>
+#include <VirtualPadSources/AtariJoystickVirtualPadWriter.h>
 
 #endif
