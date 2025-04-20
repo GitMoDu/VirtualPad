@@ -131,18 +131,9 @@ public:
 
 		// Map Menu buttons.
 		Buttons += (uint16_t)(Pad.Start()) << (XBOX_START - 1);
-		//if (Pad.FeatureSelect())
-		{
-			Buttons += (uint16_t)(Pad.Select()) << (XBOX_BACK - 1);
-		}
-		//if (Pad.FeatureHome())
-		{
-			Buttons += (uint16_t)(Pad.Home()) << (XBOX_GUIDE - 1);
-		}
-		//if (Pad.FeatureShare())
-		{
-			Buttons += (uint16_t)(Pad.Share()) << (XBOX_GUIDE - 1);
-		}
+		Buttons += (uint16_t)(Pad.Select()) << (XBOX_BACK - 1);
+		Buttons += (uint16_t)(Pad.Home()) << (XBOX_GUIDE - 1);
+		Buttons += (uint16_t)(Pad.Share()) << (XBOX_GUIDE - 1);
 
 		X360.buttons(Buttons);
 
@@ -151,11 +142,7 @@ public:
 
 		X360.position(Pad.Joy1X(), Pad.Joy1Y());
 
-		//if (Pad.FeatureJoy2())
-		{
-			X360.positionRight(Pad.Joy2X(), Pad.Joy2Y());
-		}
-
+		X360.positionRight(Pad.Joy2X(), Pad.Joy2Y());
 		X360.send();
 	}
 };

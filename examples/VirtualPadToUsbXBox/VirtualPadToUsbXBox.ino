@@ -13,7 +13,7 @@
 #error This example only supports STM32F1 with Rogers core https://github.com/rogerclarkmelbourne/Arduino_STM32
 #endif
 
-// Uncomment controller to use.
+// Uncomment source controller to use.
 #define USE_JOYSTICK_SHIELD_CONTROLLER
 //#define USE_N64_CONTROLLER
 //#define USE_GAMECUBE_CONTROLLER
