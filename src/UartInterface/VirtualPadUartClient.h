@@ -1,5 +1,3 @@
-// VirtualPadOverUart.h
-
 #ifndef _VIRTUAL_PAD_UART_CLIENT_h
 #define _VIRTUAL_PAD_UART_CLIENT_h
 

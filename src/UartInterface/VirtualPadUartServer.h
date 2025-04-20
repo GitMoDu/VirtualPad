@@ -1,5 +1,3 @@
-// VirtualPadUartServer.h
-
 #ifndef _VIRTUAL_PAD_UART_SERVER_h
 #define _VIRTUAL_PAD_UART_SERVER_h
 
@@ -42,7 +40,8 @@ public:
 		, Interface(scheduler, serialInstance, this,
 			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
 		, Pad(virtualPad)
-	{}
+	{
+	}
 
 	/// <summary>
 	/// Passthrough event to wake up uart reader, if needed.
