@@ -1,7 +1,7 @@
-#ifndef _VIRTUAL_PAD_SOURCES_INCLUDE_h
-#define _VIRTUAL_PAD_SOURCES_INCLUDE_h
+#ifndef _VIRTUAL_PADS_INCLUDE_h
+#define _VIRTUAL_PADS_INCLUDE_h
 
-
+#if defined(ARDUINO)
 #include "VirtualPads/JoystickShieldVirtualPad.h"
 
 #include "VirtualPads/AtariJoystickVirtualPad.h"
@@ -10,5 +10,10 @@
 
 #include "VirtualPads/Nintendo64VirtualPad.h"
 #include "VirtualPads/GameCubeVirtualPad.h"
+#endif
+
+#if defined(_WINDOWS_)
+#include "VirtualPads/WindowsVirtualPad.h"
+#endif
 
 #endif
