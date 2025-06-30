@@ -8,7 +8,7 @@ namespace VirtualPad
 	template<typename state_t>
 	struct StateListener
 	{
-		virtual void OnUpdate(state_t& state) {}
+		virtual void OnUpdate(const state_t& state) {}
 	};
 
 	using ButtonPadStateListener = StateListener<button_pad_state_t>;
