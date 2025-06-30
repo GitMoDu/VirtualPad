@@ -39,9 +39,9 @@ namespace AtariJoystick
 
 		void Read()
 		{
-			SetA(*this, !digitalRead((uint8_t)Pin::Button));
+			SetA(!digitalRead((uint8_t)Pin::Button));
 
-			SetDPad(*this,
+			SetDPad(
 				!digitalRead((uint8_t)Pin::Up),
 				!digitalRead((uint8_t)Pin::Down),
 				!digitalRead((uint8_t)Pin::Left),
@@ -50,7 +50,7 @@ namespace AtariJoystick
 
 			if (!Base::Connected())
 			{
-				SetConnected(*this, true);
+				SetConnected(true);
 			}
 		}
 	};

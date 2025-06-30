@@ -106,74 +106,74 @@ namespace JoystickShield
 			{
 				joyY = ((int32_t)(AdcMiddle - y) * INT16_MIN) / (AdcMiddle);
 			}
-			SetJoy1(*this, joyX, joyY);
+			SetJoy1(joyX, joyY);
 
 			if (pinA != UINT8_MAX)
 			{
-				SetA(*this, !digitalRead(pinA));
+				SetA(!digitalRead(pinA));
 			}
 			else
 			{
-				SetA(*this, false);
+				SetA(false);
 			}
 
 			if (pinB != UINT8_MAX)
 			{
-				SetB(*this, !digitalRead(pinB));
+				SetB(!digitalRead(pinB));
 			}
 			else
 			{
-				SetB(*this, false);
+				SetB(false);
 			}
 
 			if (pinX != UINT8_MAX)
 			{
-				SetX(*this, !digitalRead(pinX));
+				SetX(!digitalRead(pinX));
 			}
 			else
 			{
-				SetX(*this, false);
+				SetX(false);
 			}
 
 			if (pinY != UINT8_MAX)
 			{
-				SetY(*this, !digitalRead(pinY));
+				SetY(!digitalRead(pinY));
 			}
 			else
 			{
-				SetY(*this, false);
+				SetY(false);
 			}
 
 			if (pinL3 != UINT8_MAX)
 			{
-				SetL3(*this, !digitalRead(pinL3));
+				SetL3(!digitalRead(pinL3));
 			}
 			else
 			{
-				SetL3(*this, false);
+				SetL3(false);
 			}
 
 			if (pinStart != UINT8_MAX)
 			{
-				SetStart(*this, !digitalRead(pinStart));
+				SetStart(!digitalRead(pinStart));
 			}
 			else
 			{
-				SetStart(*this, false);
+				SetStart(false);
 			}
 
 			if (pinSelect != UINT8_MAX)
 			{
-				SetSelect(*this, !digitalRead(pinSelect));
+				SetSelect(!digitalRead(pinSelect));
 			}
 			else
 			{
-				SetSelect(*this, false);
+				SetSelect(false);
 			}
 
 			if (!Base::Connected())
 			{
-				SetConnected(*this, true);
+				SetConnected(true);
 			}
 		}
 	};

@@ -52,29 +52,29 @@ namespace GameCubeController
 	public:
 		void Step(GameCubeController::data_t& data)
 		{
-			SetStart(*this, data.Button<ButtonsEnum::Start>());
+			SetStart(data.Button<ButtonsEnum::Start>());
 
-			SetDPad(*this, data.Button<ButtonsEnum::Up>(), data.Button<ButtonsEnum::Down>(), data.Button<ButtonsEnum::Left>(), data.Button<ButtonsEnum::Right>());
+			SetDPad(data.Button<ButtonsEnum::Up>(), data.Button<ButtonsEnum::Down>(), data.Button<ButtonsEnum::Left>(), data.Button<ButtonsEnum::Right>());
 
-			SetA(*this, data.Button<ButtonsEnum::A>());
-			SetB(*this, data.Button<ButtonsEnum::B>());
-			SetX(*this, data.Button<ButtonsEnum::X>());
-			SetY(*this, data.Button<ButtonsEnum::Y>());
+			SetA(data.Button<ButtonsEnum::A>());
+			SetB(data.Button<ButtonsEnum::B>());
+			SetX(data.Button<ButtonsEnum::X>());
+			SetY(data.Button<ButtonsEnum::Y>());
 
-			SetP1(*this, data.Button<ButtonsEnum::L1>());
-			SetP2(*this, data.Button<ButtonsEnum::R1>());
+			SetP1(data.Button<ButtonsEnum::L1>());
+			SetP2(data.Button<ButtonsEnum::R1>());
 
-			SetL2(*this, L2Mapper::Map(data.L2));
-			SetR2(*this, L2Mapper::Map(data.R2));
+			SetL2(L2Mapper::Map(data.L2));
+			SetR2(L2Mapper::Map(data.R2));
 
-			SetL1(*this, data.Button<ButtonsEnum::Z>());
+			SetL1(data.Button<ButtonsEnum::Z>());
 
 			Joystick1Mapper::Map(data.JoystickX, data.JoystickY, joy1X, joy1Y);
 			Joystick2Mapper::Map(data.JoystickCX, data.JoystickCY, joy2X, joy2Y);
 
 			if (!Base::Connected())
 			{
-				SetConnected(*this, true);
+				SetConnected(true);
 			}
 		}
 	};

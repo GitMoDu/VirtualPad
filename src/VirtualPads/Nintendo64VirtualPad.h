@@ -51,24 +51,24 @@ namespace Nintendo64Controller
 
 		void Step(Nintendo64Controller::data_t& data)
 		{
-			SetA(*this, data.Button<ButtonsEnum::A>());
-			SetB(*this, data.Button<ButtonsEnum::B>());
+			SetA(data.Button<ButtonsEnum::A>());
+			SetB(data.Button<ButtonsEnum::B>());
 
-			SetL1(*this, data.Button<ButtonsEnum::L>());
-			SetR1(*this, data.Button<ButtonsEnum::R>());
-			SetStart(*this, data.Button<ButtonsEnum::Start>());
+			SetL1(data.Button<ButtonsEnum::L>());
+			SetR1(data.Button<ButtonsEnum::R>());
+			SetStart(data.Button<ButtonsEnum::Start>());
 
-			SetDPad(*this, data.Button<ButtonsEnum::Up>(), data.Button<ButtonsEnum::Down>(), data.Button<ButtonsEnum::Left>(), data.Button<ButtonsEnum::Right>());
+			SetDPad(data.Button<ButtonsEnum::Up>(), data.Button<ButtonsEnum::Down>(), data.Button<ButtonsEnum::Left>(), data.Button<ButtonsEnum::Right>());
 
 			JoystickMapper::Map(data.JoystickX, data.JoystickY, joy1X, joy1Y);
 
-			SetJoy2(*this, data.Button<ButtonsEnum::CUp>(), data.Button<ButtonsEnum::CDown>(), data.Button<ButtonsEnum::CLeft>(), data.Button<ButtonsEnum::CRight>());
+			VirtualPad::SetJoy2((analog_pad_state_t&)(*this), data.Button<ButtonsEnum::CUp>(), data.Button<ButtonsEnum::CDown>(), data.Button<ButtonsEnum::CLeft>(), data.Button<ButtonsEnum::CRight>());
 
-			SetL2(*this, UINT16_MAX * data.Button<ButtonsEnum::Z>());
+			SetL2(UINT16_MAX * data.Button<ButtonsEnum::Z>());
 
 			if (!Base::Connected())
 			{
-				SetConnected(*this, true);
+				SetConnected(true);
 			}
 		}
 	};

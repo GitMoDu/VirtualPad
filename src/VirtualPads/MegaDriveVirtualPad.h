@@ -53,22 +53,22 @@ namespace MegaDriveController
 			{
 				if (Base::Connected())
 				{
-					SetConnected(*this, false);
+					SetConnected(false);
 				}
 			}
 			else if (!Base::Connected())
 			{
-				SetConnected(*this, true);
+				SetConnected(true);
 			}
 
-			VirtualPad::SetA(*this, !digitalRead((uint8_t)ControllerPin::AB));
-			VirtualPad::SetStart(*this, !digitalRead((uint8_t)ControllerPin::StartC));
+			SetA(!digitalRead((uint8_t)ControllerPin::AB));
+			SetStart(!digitalRead((uint8_t)ControllerPin::StartC));
 
 			digitalWrite((uint8_t)ControllerPin::Select, HIGH);
-			VirtualPad::SetB(*this, !digitalRead((uint8_t)ControllerPin::AB));
-			VirtualPad::SetR3(*this, !digitalRead((uint8_t)ControllerPin::StartC));
+			SetB(!digitalRead((uint8_t)ControllerPin::AB));
+			SetR3(!digitalRead((uint8_t)ControllerPin::StartC));
 
-			VirtualPad::SetDPad(*this,
+			SetDPad(
 				!digitalRead((uint8_t)ControllerPin::Up),
 				!digitalRead((uint8_t)ControllerPin::Down),
 				!digitalRead((uint8_t)ControllerPin::InfoLeft),

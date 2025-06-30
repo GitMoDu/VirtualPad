@@ -126,7 +126,7 @@ void loop()
 			LastUpdate = timestamp;
 			if (!Pad.Connected())
 			{
-				VirtualPad::SetConnected(Pad, true);
+				Pad.SetConnected(true);
 			}
 		}
 		else if (timestamp - LastUpdate >= TimeOutPeriodMillis)
@@ -164,7 +164,7 @@ void loop()
 			delay(1);
 			if (JoyBusReader.ReadControllerData(ControllerData))
 			{
-				VirtualPad::SetConnected(Pad, true);
+				Pad.SetConnected(true);
 				LastUpdate = timestamp - UpdatePeriodMillis;
 			}
 			else
