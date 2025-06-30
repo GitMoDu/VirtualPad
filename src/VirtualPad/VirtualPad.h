@@ -74,17 +74,17 @@ namespace VirtualPad
 	public:
 		void CopyTo(TemplateVirtualPad& to)
 		{
-			CopyState((pad_state_t&)to, (const pad_state_t&)*this);
+			memcpy(&to, this, sizeof(pad_state_t));
 		}
 
 		void CopyFrom(const TemplateVirtualPad& from)
 		{
-			CopyState((pad_state_t&)*this, (const pad_state_t&)from);
+			memcpy(this, &from, sizeof(pad_state_t));
 		}
 
 		void Clear()
 		{
-			ClearState((pad_state_t&)*this);
+			memset(this, uint8_t(0), sizeof(pad_state_t));
 		}
 
 		/// <summary>
@@ -261,17 +261,6 @@ namespace VirtualPad
 		}
 	};
 
-	template<typename state_t>
-	static void CopyState(state_t& to, const state_t& from)
-	{
-		memcpy(&to, &from, sizeof(state_t));
-	}
-
-	template<typename state_t>
-	static void ClearState(state_t& state)
-	{
-		memset(&state, uint8_t(0), sizeof(state_t));
-	}
 
 	template<uint32_t configurationCode>
 	using ButtonVirtualPad = TemplateVirtualPad<button_pad_state_t, configurationCode>;

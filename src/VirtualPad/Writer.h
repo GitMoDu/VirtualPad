@@ -8,161 +8,6 @@
 /// </summary>
 namespace VirtualPad
 {
-	static void SetConnected(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::Connected)>(state.flags, value);
-	}
-
-	static void SetA(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::A)>(state.flags, value);
-	}
-
-	static void SetB(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::B)>(state.flags, value);
-	}
-
-	static void SetX(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::X)>(state.flags, value);
-	}
-
-	static void SetY(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::Y)>(state.flags, value);
-	}
-
-	static void SetL1(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::L1)>(state.flags, value);
-	}
-
-	static void SetR1(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::R1)>(state.flags, value);
-	}
-
-	static void SetL3(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::L3)>(state.flags, value);
-	}
-
-	static void SetR3(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::R3)>(state.flags, value);
-	}
-
-	static void SetP1(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::P1)>(state.flags, value);
-	}
-
-	static void SetP2(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::P2)>(state.flags, value);
-	}
-
-	static void SetChat(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::Chat)>(state.flags, value);
-	}
-
-	static void SetHome(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::Home)>(state.flags, value);
-	}
-
-	static void SetShare(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::Share)>(state.flags, value);
-	}
-
-	static void SetSelect(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::Select)>(state.flags, value);
-	}
-
-	static void SetStart(button_pad_state_t& state, const bool value)
-	{
-		FlagMask::SetFlag<uint8_t(FlagEnum::Start)>(state.flags, value);
-	}
-
-	/// <summary>
-	/// Sets the D-Pad direction based on the individual button states.
-	/// Biased to the first button detected, if multiple directions are active.
-	/// </summary>
-	/// <param name="state">Virtual Pad state.</param>
-	/// <param name="up">Is up pressed.</param>
-	/// <param name="down">Is down pressed.</param>
-	/// <param name="left">Is left pressed.</param>
-	/// <param name="right">Is right pressed.</param>
-	static void SetDPad(button_pad_state_t& state, const bool up, const bool down, const bool left, const bool right)
-	{
-		if (up)
-		{
-			if (left)
-			{
-				state.dPad = DPadEnum::UpLeft;
-			}
-			else if (right)
-			{
-				state.dPad = DPadEnum::UpRight;
-			}
-			else
-			{
-				state.dPad = DPadEnum::Up;
-			}
-		}
-		else if (down)
-		{
-			if (left)
-			{
-				state.dPad = DPadEnum::DownLeft;
-			}
-			else if (right)
-			{
-				state.dPad = DPadEnum::DownRight;
-			}
-			else
-			{
-				state.dPad = DPadEnum::Down;
-			}
-		}
-		else if (left)
-		{
-			state.dPad = DPadEnum::Left;
-		}
-		else if (right)
-		{
-			state.dPad = DPadEnum::Right;
-		}
-		else
-		{
-			state.dPad = DPadEnum::None;
-		}
-	}
-
-	/// <summary>
-	/// Set L2 analog value directly.
-	/// </summary>
-	/// <param name="state">Virtual Pad state.</param>
-	/// <param name="value">[0 ; UINT16_MAX]</param>
-	static void SetL2(analog_pad_state_t& state, const uint16_t value)
-	{
-		state.l2 = value;
-	}
-
-	/// <summary>
-	/// Set R2 analog value directly.
-	/// </summary>
-	/// <param name="state">Virtual Pad state.</param>
-	/// <param name="value">[0 ; UINT16_MAX]</param>
-	static void SetR2(analog_pad_state_t& state, const uint16_t value)
-	{
-		state.r2 = value;
-	}
-
 	/// <summary>
 	/// Set Joy1 analog values directly from an 8 bit source.
 	/// </summary>
@@ -190,18 +35,6 @@ namespace VirtualPad
 	}
 
 	/// <summary>
-	/// Set Joy1 analog values directly.
-	/// </summary>
-	/// <param name="state">Virtual Pad state.</param>
-	/// <param name="x">[INT16_MIN ; INT16_MAX]</param>
-	/// <param name="y">[INT16_MIN ; INT16_MAX]</param>
-	static void SetJoy1(analog_pad_state_t& state, const int16_t x, const int16_t y)
-	{
-		state.joy1X = x;
-		state.joy1Y = y;
-	}
-
-	/// <summary>
 	/// Set Joy1 analog values from a unsigned source.
 	/// </summary>
 	/// <param name="state">Virtual Pad state.</param>
@@ -226,18 +59,6 @@ namespace VirtualPad
 		{
 			state.joy1Y = -((int16_t)INT16_MAX - (int16_t)y);
 		}
-	}
-
-	/// <summary>
-	/// Set Joy2 analog values directly.
-	/// </summary>
-	/// <param name="state">Virtual Pad state.</param>
-	/// <param name="x">[INT16_MIN ; INT16_MAX]</param>
-	/// <param name="y">[INT16_MIN ; INT16_MAX]</param>
-	static void SetJoy2(analog_pad_state_t& state, const int16_t x, const int16_t y)
-	{
-		state.joy2X = x;
-		state.joy2Y = y;
 	}
 
 	/// <summary>

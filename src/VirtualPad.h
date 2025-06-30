@@ -14,6 +14,9 @@
 #include "VirtualPad/Writer.h"
 #include "VirtualPad/Interface.h"
 
+
+#include "Feedback/Feedback.h"
+
 #include "Parser/ButtonParser.h"
 #include "Parser/AxisParser.h"
 #include "Parser/JoystickParser.h"

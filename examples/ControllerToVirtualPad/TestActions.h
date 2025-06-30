@@ -13,7 +13,7 @@ using namespace VirtualPad;
 class TestActions
 {
 private:
-	ButtonParser::Action ActionFlags[(uint8_t)FlagEnum::EnumCount]{};
+	ButtonParser::Action ActionFlags[(uint8_t)ButtonEnum::EnumCount]{};
 
 	ButtonParser::DirectionAction ActionDPad{};
 
@@ -30,7 +30,7 @@ public:
 
 	void Clear()
 	{
-		for (uint8_t i = 0; i < (uint8_t)FlagEnum::EnumCount; i++)
+		for (uint8_t i = 0; i < (uint8_t)ButtonEnum::EnumCount; i++)
 		{
 			ActionFlags[i].Clear();
 		}
@@ -58,24 +58,24 @@ public:
 		{
 			bool action = false;
 
-			action |= ActionFlags[(uint8_t)FlagEnum::A].Parse(state.A());
-			action |= ActionFlags[(uint8_t)FlagEnum::B].Parse(state.B());
-			action |= ActionFlags[(uint8_t)FlagEnum::X].Parse(state.X());
-			action |= ActionFlags[(uint8_t)FlagEnum::Y].Parse(state.Y());
+			action |= ActionFlags[(uint8_t)ButtonEnum::A].Parse(state.A());
+			action |= ActionFlags[(uint8_t)ButtonEnum::B].Parse(state.B());
+			action |= ActionFlags[(uint8_t)ButtonEnum::X].Parse(state.X());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Y].Parse(state.Y());
 
-			action |= ActionFlags[(uint8_t)FlagEnum::L1].Parse(state.L1());
-			action |= ActionFlags[(uint8_t)FlagEnum::R1].Parse(state.R1());
-			action |= ActionFlags[(uint8_t)FlagEnum::L3].Parse(state.L3());
-			action |= ActionFlags[(uint8_t)FlagEnum::R3].Parse(state.R3());
+			action |= ActionFlags[(uint8_t)ButtonEnum::L1].Parse(state.L1());
+			action |= ActionFlags[(uint8_t)ButtonEnum::R1].Parse(state.R1());
+			action |= ActionFlags[(uint8_t)ButtonEnum::L3].Parse(state.L3());
+			action |= ActionFlags[(uint8_t)ButtonEnum::R3].Parse(state.R3());
 
-			action |= ActionFlags[(uint8_t)FlagEnum::P1].Parse(state.P1());
-			action |= ActionFlags[(uint8_t)FlagEnum::P2].Parse(state.P2());
+			action |= ActionFlags[(uint8_t)ButtonEnum::P1].Parse(state.P1());
+			action |= ActionFlags[(uint8_t)ButtonEnum::P2].Parse(state.P2());
 
-			action |= ActionFlags[(uint8_t)FlagEnum::Start].Parse(state.Start());
-			action |= ActionFlags[(uint8_t)FlagEnum::Select].Parse(state.Select());
-			action |= ActionFlags[(uint8_t)FlagEnum::Home].Parse(state.Home());
-			action |= ActionFlags[(uint8_t)FlagEnum::Share].Parse(state.Share());
-			action |= ActionFlags[(uint8_t)FlagEnum::Share].Parse(state.Chat());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Start].Parse(state.Start());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Select].Parse(state.Select());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Home].Parse(state.Home());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Share].Parse(state.Share());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Share].Parse(state.Chat());
 
 			action |= ActionDPad.Parse(state.DPad());
 
@@ -101,24 +101,24 @@ public:
 		{
 			bool action = false;
 
-			action |= ActionFlags[(uint8_t)FlagEnum::A].Parse(state.A());
-			action |= ActionFlags[(uint8_t)FlagEnum::B].Parse(state.B());
-			action |= ActionFlags[(uint8_t)FlagEnum::X].Parse(state.X());
-			action |= ActionFlags[(uint8_t)FlagEnum::Y].Parse(state.Y());
+			action |= ActionFlags[(uint8_t)ButtonEnum::A].Parse(state.A());
+			action |= ActionFlags[(uint8_t)ButtonEnum::B].Parse(state.B());
+			action |= ActionFlags[(uint8_t)ButtonEnum::X].Parse(state.X());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Y].Parse(state.Y());
 
-			action |= ActionFlags[(uint8_t)FlagEnum::L1].Parse(state.L1());
-			action |= ActionFlags[(uint8_t)FlagEnum::R1].Parse(state.R1());
-			action |= ActionFlags[(uint8_t)FlagEnum::L3].Parse(state.L3());
-			action |= ActionFlags[(uint8_t)FlagEnum::R3].Parse(state.R3());
+			action |= ActionFlags[(uint8_t)ButtonEnum::L1].Parse(state.L1());
+			action |= ActionFlags[(uint8_t)ButtonEnum::R1].Parse(state.R1());
+			action |= ActionFlags[(uint8_t)ButtonEnum::L3].Parse(state.L3());
+			action |= ActionFlags[(uint8_t)ButtonEnum::R3].Parse(state.R3());
 
-			action |= ActionFlags[(uint8_t)FlagEnum::P1].Parse(state.P1());
-			action |= ActionFlags[(uint8_t)FlagEnum::P2].Parse(state.P2());
+			action |= ActionFlags[(uint8_t)ButtonEnum::P1].Parse(state.P1());
+			action |= ActionFlags[(uint8_t)ButtonEnum::P2].Parse(state.P2());
 
-			action |= ActionFlags[(uint8_t)FlagEnum::Start].Parse(state.Start());
-			action |= ActionFlags[(uint8_t)FlagEnum::Select].Parse(state.Select());
-			action |= ActionFlags[(uint8_t)FlagEnum::Home].Parse(state.Home());
-			action |= ActionFlags[(uint8_t)FlagEnum::Share].Parse(state.Share());
-			action |= ActionFlags[(uint8_t)FlagEnum::Share].Parse(state.Chat());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Start].Parse(state.Start());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Select].Parse(state.Select());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Home].Parse(state.Home());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Share].Parse(state.Share());
+			action |= ActionFlags[(uint8_t)ButtonEnum::Share].Parse(state.Chat());
 
 			action |= ActionDPad.Parse(state.DPad());
 
@@ -159,7 +159,7 @@ public:
 
 	const bool Buttons() const
 	{
-		for (uint8_t i = 0; i < (uint8_t)FlagEnum::EnumCount; i++)
+		for (uint8_t i = 0; i < (uint8_t)ButtonEnum::EnumCount; i++)
 		{
 			if (ActionFlags[i].ActionDown())
 			{
@@ -172,77 +172,77 @@ public:
 
 	const bool A() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::A].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::A].ActionDown();
 	}
 
 	const bool B() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::B].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::B].ActionDown();
 	}
 
 	const bool X() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::X].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::X].ActionDown();
 	}
 
 	const bool Y() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::Y].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::Y].ActionDown();
 	}
 
 	const bool L1() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::L1].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::L1].ActionDown();
 	}
 
 	const bool R1() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::R1].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::R1].ActionDown();
 	}
 
 	const bool L3() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::L3].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::L3].ActionDown();
 	}
 
 	const bool R3() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::R3].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::R3].ActionDown();
 	}
 
 	const bool P1() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::P1].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::P1].ActionDown();
 	}
 
 	const bool P2() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::P2].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::P2].ActionDown();
 	}
 
 	const bool Start() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::Start].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::Start].ActionDown();
 	}
 
 	const bool Select() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::Select].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::Select].ActionDown();
 	}
 
 	const bool Home() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::Home].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::Home].ActionDown();
 	}
 
 	const bool Share() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::Share].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::Share].ActionDown();
 	}
 
 	const bool Chat() const
 	{
-		return ActionFlags[(uint8_t)FlagEnum::Chat].ActionDown();
+		return ActionFlags[(uint8_t)ButtonEnum::Chat].ActionDown();
 	}
 };
 
