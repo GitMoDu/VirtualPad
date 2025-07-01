@@ -14,6 +14,7 @@ private:
 public:
 	PadStepperTask(TS::Scheduler& scheduler, update_pad_t& pad)
 		: TS::Task(10, TASK_FOREVER, &scheduler, true)
+		, Pad(pad)
 	{
 	}
 
@@ -25,6 +26,8 @@ public:
 		{
 			Pad.SetConnected(true);
 		}
+
+		return true;
 	}
 };
 

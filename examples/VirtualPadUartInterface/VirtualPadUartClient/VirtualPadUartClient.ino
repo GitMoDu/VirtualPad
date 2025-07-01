@@ -5,8 +5,8 @@
 *	Task Scheduler https://github.com/arkhipenko/TaskScheduler
 */
 
-#define DEBUG
-#define SERIAL_BAUD_RATE 9600
+//#define DEBUG
+#define SERIAL_BAUD_RATE 115200
 
 #define _TASK_OO_CALLBACKS
 #include <TScheduler.hpp>
@@ -17,12 +17,23 @@
 
 
 // UART modem definition.
-#if defined(ARDUINO_ARCH_NRF)
+#if defined(ARDUINO_ARCH_NRF52)
+#include <Adafruit_LittleFS.h>
+#include <InternalFileSystem.h>
+#ifdef DEBUG
 using UartType = Adafruit_USBD_CDC;
+UartType& UartModem(Serial);
+#else
+using UartType = Uart;
 UartType& UartModem(Serial1);
+#endif
 #else
 using UartType = HardwareSerial;
+#if defined(ARDUINO_ARCH_AVR)
 UartType& UartModem(Serial);
+#else
+UartType& UartModem(Serial1);
+#endif
 #endif
 
 // Pad sink definition.
