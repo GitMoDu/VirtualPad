@@ -21,10 +21,10 @@
 #include <InternalFileSystem.h>
 #ifdef DEBUG
 using UartType = Adafruit_USBD_CDC;
-UartType& UartModem(Serial1);
+UartType& UartModem(Serial);
 #else
 using UartType = Uart;
-UartType& UartModem(Serial);
+UartType& UartModem(Serial1);
 #endif
 #else
 using UartType = HardwareSerial;
