@@ -7,121 +7,145 @@
 #include <UartInterfaceTask.h>
 #include <VirtualPad.h>
 
-/// <summary>
-/// Continuously pushes out the VirtualPad state over UART.
-/// Depends on https://github.com/GitMoDu/UartInterface
-/// </summary>
-/// <typeparam name="SerialType"></typeparam>
-/// <typeparam name="UartDefinitions"></typeparam>
-/// <typeparam name="pad_state_t"></typeparam>
-/// <typeparam name="UpdateLongPeriod"></typeparam>
-/// <typeparam name="UpdatePeriod"></typeparam>
-template<typename SerialType,
-	typename UartDefinitions = UartInterface::TemplateUartDefinitions<>,
-	typename pad_state_t = VirtualPad::analog_pad_state_t,
-	uint32_t UpdatePeriod = 10,
-	uint32_t UpdateLongPeriod = 50>
-class VirtualPadUartServerTask : public virtual UartInterfaceListener, private TS::Task
+namespace VirtualPadUartInterface
 {
-private:
-	using MessageEnum = VirtualPadUartInterface::MessageEnum;
-
-private:
-	UartInterfaceTask<SerialType, UartDefinitions> Interface;
-
-private:
-	pad_state_t Pad;
-
-private:
-	pad_state_t RawState{};
-
-	uint32_t LastCommandReceived = 0;
-
-public:
-	VirtualPadUartServerTask(TS::Scheduler& scheduler,
-		SerialType& serialInstance,
-		pad_state_t& virtualPad)
-		: UartInterfaceListener()
-		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
-		, Interface(scheduler, serialInstance, this,
-			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
-		, Pad(virtualPad)
-	{
-	}
-
 	/// <summary>
-	/// Passthrough event to wake up uart reader, if needed.
+	/// Continuously pushes out the VirtualPad state over UART.
+	/// Depends on https://github.com/GitMoDu/UartInterface
 	/// </summary>
-	void OnSerialEvent()
+	/// <typeparam name="SerialType"></typeparam>
+	/// <typeparam name="UartDefinitions"></typeparam>
+	/// <typeparam name="pad_state_t"></typeparam>
+	/// <typeparam name="UpdateLongPeriod"></typeparam>
+	/// <typeparam name="UpdatePeriod"></typeparam>
+	template<typename SerialType,
+		typename UartDefinitions = UartInterface::TemplateUartDefinitions<>,
+		typename pad_state_t = VirtualPad::analog_pad_state_t,
+		uint32_t UpdatePeriod = 5,
+		uint32_t UpdateLongPeriod = 50>
+	class ServerTask : public virtual UartInterface::UartListener, public TS::Task
 	{
-		Interface.OnSerialEvent();
-	}
+	private:
+		UartInterface::UartInterfaceTask<SerialType, UartDefinitions> Interface;
 
-	void Start()
-	{
-		Interface.Start();
-		TS::Task::enableDelayed(0);
-	}
+	private:
+		pad_state_t& Pad;
 
-	void Stop()
-	{
-		TS::Task::disable();
-		Interface.Stop();
-	}
+	private:
+		pad_state_t RawState{};
 
-	bool Callback() final
-	{
-		if (Interface.IsSerialConnected())
+		uint32_t LastCommandReceived = 0;
+
+	public:
+		ServerTask(TS::Scheduler& scheduler,
+			SerialType& serialInstance,
+			pad_state_t& virtualPad)
+			: UartInterface::UartListener()
+			, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
+			, Interface(scheduler, serialInstance, this, VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
+			, Pad(virtualPad)
 		{
-			memcpy(&RawState, &Pad, sizeof(pad_state_t));
+		}
 
-			if (RawState.Connected())
+		bool Setup()
+		{
+			return Interface.Setup();
+		}
+
+		/// <summary>
+		/// Passthrough event to wake up uart reader, if needed.
+		/// </summary>
+		void OnSerialEvent()
+		{
+			Interface.OnSerialEvent();
+		}
+
+		void Start()
+		{
+			Interface.Start();
+			TS::Task::enableDelayed(0);
+		}
+
+		void Stop()
+		{
+			TS::Task::enable();
+			Interface.Stop();
+		}
+
+		bool Callback() final
+		{
+			if (Interface.IsSerialConnected())
 			{
-				TS::Task::delay(UpdatePeriod);
+				if (Interface.CanSendMessage())
+				{
+					RawState = Pad;
+
+					if (RawState.Connected())
+					{
+						TS::Task::delay(UpdatePeriod);
+					}
+					else
+					{
+						TS::Task::delay(UpdateLongPeriod);
+					}
+
+					Interface.SendMessage((uint8_t)VirtualPadUartInterface::MessageEnum::UpdateState, (uint8_t*)&RawState, sizeof(pad_state_t));
+				}
+				else
+				{
+					TS::Task::delay(0);
+				}
 			}
 			else
 			{
 				TS::Task::delay(UpdateLongPeriod);
 			}
 
-			Interface.SendMessage((uint8_t)MessageEnum::UpdateState, (uint8_t*)&RawState, sizeof(pad_state_t));
+			return true;
 		}
-		else
+
+		void OnUartStateChange(const bool connected) final
 		{
-			TS::Task::delay(UpdateLongPeriod);
+			if (connected)
+			{
+				TS::Task::enableDelayed(0);
+			}
 		}
 
-		return true;
-	}
-
-	void OnUartStateChange(const bool connected) final
-	{
-		if (connected)
+		void OnUartRx(const uint8_t header) final
 		{
-			TS::Task::enableDelayed(0);
 		}
-	}
 
-	void OnUartRx(const uint8_t header) final
-	{
-	}
 
-	void OnUartRx(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize)
-	{
-		switch ((MessageEnum)header)
+		void OnUartTx() final
 		{
-		case MessageEnum::UpdateFeedback:
-			LastCommandReceived = millis();
-
-			//TODO: notify feedback listener.
-			//if (payloadSize == ?)
-			//{
-				// TODO:
-			//}
-			break;
-		default:
-			break;
 		}
-	}
-};
+
+		void OnUartRxError(const UartInterface::RxErrorEnum error) final
+		{
+		}
+
+		void OnUartTxError(const UartInterface::TxErrorEnum error) final
+		{
+		}
+
+		void OnUartRx(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize) final
+		{
+			switch ((VirtualPadUartInterface::MessageEnum)header)
+			{
+			case VirtualPadUartInterface::MessageEnum::UpdateFeedback:
+				LastCommandReceived = millis();
+
+				//TODO: notify feedback listener.
+				//if (payloadSize == ?)
+				//{
+					// TODO:
+				//}
+				break;
+			default:
+				break;
+			}
+		}
+	};
+}
 #endif
