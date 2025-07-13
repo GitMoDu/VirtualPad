@@ -11,6 +11,19 @@ namespace VirtualPadUartInterface
 		UpdateFeedback = 1
 	};
 
+	template<uint32_t baudrate = 115200,
+		uint8_t maxSerialStep = 32,
+		uint32_t timeoutMillis = 20,
+		uint32_t pollPeriodMillis = 1>
+	using TemplateUartDefinitions = UartInterface::TemplateUartDefinitions<
+		baudrate,
+		128,
+		maxSerialStep,
+		maxSerialStep,
+		timeoutMillis,
+		timeoutMillis,
+		pollPeriodMillis>;
+
 	/// <summary>
 	/// </summary>
 	static constexpr uint8_t UartKey[] = { 'V', 'i', 'r', 't', 'u', 'a', 'l', 'P', 'a', 'd' };
