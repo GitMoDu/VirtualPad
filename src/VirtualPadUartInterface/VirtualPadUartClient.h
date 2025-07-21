@@ -7,207 +7,238 @@
 #include <UartInterfaceTask.h>
 #include <VirtualPad.h>
 
-/// <summary>
-/// Listens to UART updates for VirtualPad.
-/// Depends on https://github.com/GitMoDu/UartInterface
-/// </summary>
-/// <typeparam name="SerialType"></typeparam>
-/// <typeparam name="UartDefinitions"></typeparam>
-/// <typeparam name="pad_state_t"></typeparam>
-template<typename SerialType,
-	typename UartDefinitions = UartInterface::TemplateUartDefinitions<>,
-	typename pad_state_t = VirtualPad::analog_pad_state_t>
-class VirtualPadUartClientTask : public virtual UartInterfaceListener, private TS::Task
+#if __has_include(<type_traits>)
+#include <type_traits>
+#endif
+
+namespace VirtualPadUartInterface
 {
-private:
-	using MessageEnum = VirtualPadUartInterface::MessageEnum;
-
-private:
-	UartInterfaceTask<SerialType, UartDefinitions> Interface;
-
-private:
-	pad_state_t& Pad;
-
-private:
-	VirtualPad::StateListener<pad_state_t>* Listener;
-	Print* SerialLogger;
-
-private:
-	uint32_t LastUpdate = 0;
-	bool FeedbackPending = 0;
-
-	static const uint32_t OperatorCheckPeriod = 50;
-	static const uint32_t OperatorTimeoutPeriod = 500;
-
-public:
-	VirtualPadUartClientTask(TS::Scheduler& scheduler,
-		SerialType& serialInstance,
-		pad_state_t& pad,
-		VirtualPad::StateListener<pad_state_t>* listener = nullptr,
-		Print* serialLogger = nullptr)
-		: UartInterfaceListener()
-		, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
-		, Interface(scheduler, serialInstance, this,
-			VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
-		, Pad(pad)
-		, Listener(listener)
-		, SerialLogger(serialLogger)
-	{
-	}
-
 	/// <summary>
-	/// Passthrough event to wake up uart reader, if needed.
+	/// Listens to UART updates for VirtualPad.
+	/// Depends on https://github.com/GitMoDu/UartInterface
 	/// </summary>
-	void OnSerialEvent()
+	/// <typeparam name="SerialType"></typeparam>
+	/// <typeparam name="UartDefinitions"></typeparam>
+	/// <typeparam name="pad_state_t"></typeparam>
+	template<typename SerialType,
+		typename UartDefinitions = VirtualPadUartInterface::TemplateUartDefinitions<>,
+		typename pad_state_t = VirtualPad::analog_pad_state_t>
+	class ClientTask : public UartInterface::UartListener, public TS::Task
 	{
-		Interface.OnSerialEvent();
-	}
+#if __has_include(<type_traits>)
+	private:
+		static_assert(std::is_trivially_copyable<VirtualPad::analog_pad_state_t>::value, "Not trivially copyable!");
+#endif
 
-	void Start()
-	{
-		Interface.Start();
-		TS::Task::enableDelayed(0);
-	}
+	private:
+		using MessageEnum = VirtualPadUartInterface::MessageEnum;
 
-	void Stop()
-	{
-		TS::Task::disable();
-		Interface.Stop();
-	}
+	private:
+		UartInterface::UartInterfaceTask<SerialType, UartDefinitions> Interface;
 
-	virtual bool Callback() final
-	{
-		if (Pad.Connected()
-			&& ((millis() - LastUpdate) > OperatorTimeoutPeriod))
+	private:
+		pad_state_t Pad{};
+
+	private:
+		VirtualPad::StateListener<pad_state_t>* Listener;
+		Print* SerialLogger;
+
+	private:
+		uint32_t LastUpdate = 0;
+		bool FeedbackPending = 0;
+
+		static const uint32_t OperatorCheckPeriod = 50;
+		static const uint32_t OperatorTimeoutPeriod = 500;
+
+	public:
+		ClientTask(TS::Scheduler& scheduler,
+			SerialType& serialInstance,
+			VirtualPad::StateListener<pad_state_t>* listener = nullptr,
+			Print* serialLogger = nullptr)
+			: UartInterface::UartListener()
+			, TS::Task(TASK_IMMEDIATE, TASK_FOREVER, &scheduler, false)
+			, Interface(scheduler, serialInstance, this,
+				VirtualPadUartInterface::UartKey, sizeof(VirtualPadUartInterface::UartKey))
+			, Listener(listener)
+			, SerialLogger(serialLogger)
 		{
-			memset(&Pad, 0, sizeof(pad_state_t));
-			if (Listener != nullptr)
-			{
-				Listener->OnUpdate(Pad);
-			}
-			TS::Task::delay(OperatorCheckPeriod);
 		}
-		else if (FeedbackPending)
-		{
-			FeedbackPending = false;
 
-			//TODO: Handle feedback.
-			//Interface.SendMessage((uint8_t)MessageEnum::UpdateFeedback, (uint8_t*)?, ?);
-
-			TS::Task::delay(0);
-		}
-		else
+		bool Setup()
 		{
-			TS::Task::delay(OperatorCheckPeriod);
+			return Interface.Setup();
 		}
 
-		return true;
-	}
-
-	void OnUartStateChange(const bool connected) final
-	{
-		if (!connected
-			&& Pad.Connected())
+		/// <summary>
+		/// Passthrough event to wake up uart reader, if needed.
+		/// </summary>
+		void OnSerialEvent()
 		{
-			memset(&Pad, 0, sizeof(pad_state_t));
-			Pad.SetConnected(true);
-			if (Listener != nullptr)
-			{
-				Listener->OnUpdate(Pad);
-			}
+			Interface.OnSerialEvent();
 		}
-	}
 
-	virtual void OnUartTxError(const TxErrorEnum error) final
-	{
-		if (SerialLogger != nullptr)
+		void Start()
 		{
-			switch (error)
-			{
-			case UartInterfaceListener::TxErrorEnum::StartTimeout:
-				SerialLogger->println(F("Tx Start Timeout"));
-				break;
-			case UartInterfaceListener::TxErrorEnum::DataTimeout:
-				SerialLogger->println(F("Tx Data Timeout"));
-				break;
-			case UartInterfaceListener::TxErrorEnum::EndTimeout:
-				SerialLogger->println(F("Tx End Timeout"));
-				break;
-			default:
-				break;
-			}
+			Interface.Start();
+			TS::Task::enableDelayed(0);
 		}
-	}
 
-	virtual void OnUartRxError(const RxErrorEnum error) final
-	{
-		if (SerialLogger != nullptr)
+		void Stop()
 		{
-			switch (error)
-			{
-			case RxErrorEnum::StartTimeout:
-				SerialLogger->println(F("Rx Start Timeout"));
-				break;
-			case RxErrorEnum::Crc:
-				SerialLogger->println(F("Rx Crc Mismatch"));
-				break;
-			case RxErrorEnum::TooShort:
-				SerialLogger->println(F("Rx Too Short"));
-				break;
-			case RxErrorEnum::TooLong:
-				SerialLogger->println(F("Rx TooLong"));
-				break;
-			case RxErrorEnum::EndTimeout:
-				SerialLogger->println(F("Rx End Timeout"));
-				break;
-			default:
-				break;
-			}
+			TS::Task::disable();
+			Interface.Stop();
 		}
-	}
 
-	void OnUartRx(const uint8_t header) final
-	{
-	}
-
-	void OnUartRx(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize) final
-	{
-		switch ((MessageEnum)header)
+		bool Callback() final
 		{
-		case MessageEnum::UpdateState:
-			if (payloadSize == sizeof(VirtualPad::button_pad_state_t))
+			if (Pad.Connected()
+				&& ((millis() - LastUpdate) > OperatorTimeoutPeriod))
 			{
-				memcpy((uint8_t*)&Pad, payload, sizeof(VirtualPad::button_pad_state_t));
+				Pad = pad_state_t{};
+				if (Listener != nullptr)
+				{
+					Listener->OnUpdate(Pad);
+				}
+				TS::Task::delay(OperatorCheckPeriod);
 			}
-			else if (payloadSize == sizeof(VirtualPad::analog_pad_state_t))
+			else if (FeedbackPending)
 			{
-				memcpy((uint8_t*)&Pad, payload, sizeof(VirtualPad::analog_pad_state_t));
-			}
-			else if (payloadSize == sizeof(VirtualPad::motion_pad_state_t))
-			{
-				memcpy((uint8_t*)&Pad, payload, sizeof(VirtualPad::motion_pad_state_t));
+				FeedbackPending = false;
+
+				//TODO: Handle feedback.
+				//Interface.SendMessage((uint8_t)MessageEnum::UpdateFeedback, (uint8_t*)?, ?);
+
+				TS::Task::delay(0);
 			}
 			else
 			{
-				// Unrecognized message.
-				return;
+				TS::Task::delay(OperatorCheckPeriod);
 			}
 
-			// Unused fields should be cleared.
-			if (payloadSize >= sizeof(pad_state_t))
-			{
-				memset(&Pad, 0, payloadSize - sizeof(pad_state_t));
-			}
+			return true;
+		}
 
-			LastUpdate = millis();
+		void OnUartStateChange(const bool connected) final
+		{
+			// Reset pad state on any connection state change.
+			Pad = pad_state_t{};
+			Pad.SetConnected(false);
 			if (Listener != nullptr)
 			{
 				Listener->OnUpdate(Pad);
 			}
-			break;
-		default:
-			break;
 		}
-	}
-};
+
+		void OnUartTxError(const UartInterface::TxErrorEnum error) final
+		{
+			if (SerialLogger != nullptr)
+			{
+				switch (error)
+				{
+				case UartInterface::TxErrorEnum::StartTimeout:
+					SerialLogger->println(F("Tx Start Timeout"));
+					break;
+				case UartInterface::TxErrorEnum::DataTimeout:
+					SerialLogger->println(F("Tx Data Timeout"));
+					break;
+				case UartInterface::TxErrorEnum::EndTimeout:
+					SerialLogger->println(F("Tx End Timeout"));
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		void OnUartRxError(const UartInterface::RxErrorEnum error) final
+		{
+			if (SerialLogger != nullptr)
+			{
+				switch (error)
+				{
+				case UartInterface::RxErrorEnum::StartTimeout:
+					SerialLogger->println(F("Rx Start Timeout"));
+					break;
+				case UartInterface::RxErrorEnum::Crc:
+					SerialLogger->println(F("Rx Crc Mismatch"));
+					break;
+				case UartInterface::RxErrorEnum::TooShort:
+					SerialLogger->println(F("Rx Too Short"));
+					break;
+				case UartInterface::RxErrorEnum::TooLong:
+					SerialLogger->println(F("Rx TooLong"));
+					break;
+				case UartInterface::RxErrorEnum::EndTimeout:
+					SerialLogger->println(F("Rx End Timeout"));
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		void OnUartTx() final
+		{
+		}
+
+		void OnUartRx(const uint8_t header) final
+		{
+		}
+
+		void OnUartRx(const uint8_t header, const uint8_t* payload, const uint8_t payloadSize) final
+		{
+			switch ((MessageEnum)header)
+			{
+			case MessageEnum::UpdateState:
+				if (payloadSize == sizeof(VirtualPad::info_pad_state_t))
+				{
+					const size_t usableSize = (sizeof(pad_state_t) >= sizeof(VirtualPad::info_pad_state_t)) ?
+						sizeof(VirtualPad::info_pad_state_t) : sizeof(pad_state_t);
+					memcpy((uint8_t*)&Pad, payload, usableSize);
+				}
+				else if (payloadSize == sizeof(VirtualPad::button_pad_state_t))
+				{
+					const size_t usableSize = (sizeof(pad_state_t) >= sizeof(VirtualPad::button_pad_state_t)) ?
+						sizeof(VirtualPad::button_pad_state_t) : sizeof(pad_state_t);
+					memcpy((uint8_t*)&Pad, payload, usableSize);
+				}
+				else if (payloadSize == sizeof(VirtualPad::analog_pad_state_t))
+				{
+					const size_t usableSize = (sizeof(pad_state_t) >= sizeof(VirtualPad::analog_pad_state_t)) ?
+						sizeof(VirtualPad::analog_pad_state_t) : sizeof(pad_state_t);
+					memcpy((uint8_t*)&Pad, payload, usableSize);
+				}
+				else if (payloadSize == sizeof(VirtualPad::motion_pad_state_t))
+				{
+					const size_t usableSize = (sizeof(pad_state_t) >= sizeof(VirtualPad::motion_pad_state_t)) ?
+						sizeof(VirtualPad::motion_pad_state_t) : sizeof(pad_state_t);
+					memcpy((uint8_t*)&Pad, payload, usableSize);
+				}
+				else
+				{
+					// Unrecognized message.
+					if (SerialLogger != nullptr)
+						SerialLogger->print(F("VirtualPad Unrecognized message"));
+					return;
+				}
+
+				// Unused fields should be cleared.
+				if (payloadSize < sizeof(pad_state_t))
+				{
+					uint8_t* firstByteAddress = &((uint8_t*)(&Pad))[payloadSize];
+					memset(firstByteAddress, 0, sizeof(pad_state_t) - payloadSize);
+				}
+
+				LastUpdate = millis();
+				if (Listener != nullptr)
+				{
+					Listener->OnUpdate(Pad);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	};
+}
 #endif
