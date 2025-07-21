@@ -11,13 +11,14 @@ namespace VirtualPadUartInterface
 		UpdateFeedback = 1
 	};
 
-	template<uint32_t baudrate = 115200,
+	template<
+		uint32_t baudrate = 1000000, // ~300us per full message at 1Mbaud.
 		uint8_t maxSerialStep = 32,
 		uint32_t timeoutMillis = 20,
 		uint32_t pollPeriodMillis = 1>
 	using TemplateUartDefinitions = UartInterface::TemplateUartDefinitions<
 		baudrate,
-		128,
+		64,
 		maxSerialStep,
 		maxSerialStep,
 		timeoutMillis,
