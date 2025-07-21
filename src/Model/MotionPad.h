@@ -10,6 +10,7 @@ namespace VirtualPad
 	/// </summary>
 	struct motion_pad_state_t : analog_pad_state_t
 	{
+		uint32_t motionTimestamp = 0;
 		int16_t accelerationX = 0;
 		int16_t accelerationY = 0;
 		int16_t accelerationZ = 0;
@@ -19,6 +20,11 @@ namespace VirtualPad
 		int16_t rotationRateZ = 0;
 
 	public:// Read API.
+		uint32_t MotionTimestamp() const
+		{
+			return motionTimestamp;
+		}
+
 		int16_t AccelerationX() const
 		{
 			return accelerationX;
@@ -50,6 +56,11 @@ namespace VirtualPad
 		}
 
 	public:// Write API.
+		void SetMotionTimestamp(const uint32_t timestamp)
+		{
+			motionTimestamp = timestamp;
+		}
+
 		void SetAcceleration(const int16_t x, const int16_t y, const int16_t z)
 		{
 			accelerationX = x;
