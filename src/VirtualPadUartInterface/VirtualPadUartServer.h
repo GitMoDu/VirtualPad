@@ -19,7 +19,7 @@ namespace VirtualPadUartInterface
 	/// <typeparam name="UpdateLongPeriod"></typeparam>
 	/// <typeparam name="UpdatePeriod"></typeparam>
 	template<typename SerialType,
-		typename UartDefinitions = UartInterface::TemplateUartDefinitions<>,
+		typename UartDefinitions = VirtualPadUartInterface::TemplateUartDefinitions<>,
 		typename pad_state_t = VirtualPad::analog_pad_state_t,
 		uint32_t UpdatePeriod = 5,
 		uint32_t UpdateLongPeriod = 50>
