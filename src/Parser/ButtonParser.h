@@ -34,7 +34,7 @@ namespace VirtualPad
 			/// True if any action is flagged.
 			/// </summary>
 			/// <returns></returns>
-			const bool HasAction() const
+			bool HasAction() const
 			{
 				return Actions != 0;
 			}
@@ -42,7 +42,7 @@ namespace VirtualPad
 			/// <summary>
 			/// Returns true on button up action.
 			/// </summary>
-			const bool ActionUp() const
+			bool ActionUp() const
 			{
 				return Actions & (1 << (uint8_t)ActionEnum::Up);
 			}
@@ -50,7 +50,7 @@ namespace VirtualPad
 			/// <summary>
 			/// Returns true on button down action.
 			/// </summary>
-			const bool ActionDown() const
+			bool ActionDown() const
 			{
 				return Actions & (1 << (uint8_t)ActionEnum::Down);
 			}
@@ -61,7 +61,7 @@ namespace VirtualPad
 			/// </summary>
 			/// <param name="pressed"></param>
 			/// <returns>True when parsing results in pending action.</returns>
-			const bool Parse(const bool pressed)
+			bool Parse(const bool pressed)
 			{
 				Actions = 0;
 
@@ -120,7 +120,7 @@ namespace VirtualPad
 			/// True if any action is flagged.
 			/// </summary>
 			/// <returns></returns>
-			const bool HasAction() const
+			bool HasAction() const
 			{
 				return Actions != 0;
 			}
@@ -128,7 +128,7 @@ namespace VirtualPad
 			/// <summary>
 			/// Returns true on button up action.
 			/// </summary>
-			const bool ActionUp() const
+			bool ActionUp() const
 			{
 				return Actions & (1 << (uint8_t)ActionEnum::Up);
 			}
@@ -136,7 +136,7 @@ namespace VirtualPad
 			/// <summary>
 			/// Returns true on button down action.
 			/// </summary>
-			const bool ActionDown() const
+			bool ActionDown() const
 			{
 				return Actions & (1 << (uint8_t)ActionEnum::Down);
 			}
@@ -146,7 +146,7 @@ namespace VirtualPad
 			/// </summary>
 			/// <param name="downDuration"></param>
 			/// <returns>True on button down with at least downDuration elapsed.</returns>
-			const bool ActionDown(const uint32_t downDuration) const
+			bool ActionDown(const uint32_t downDuration) const
 			{
 				if (State)
 				{
@@ -162,7 +162,7 @@ namespace VirtualPad
 			/// </summary>
 			/// <param name="holdDuration">Minimum duration to trigger an action.</param>
 			/// <returns>True on action up with at least holdDuration elapsed.</returns>
-			const bool ActionUp(const uint32_t holdDuration) const
+			bool ActionUp(const uint32_t holdDuration) const
 			{
 				if (ActionUp())
 				{
