@@ -1,6 +1,8 @@
 # VirtualPad
 
-Embedded virtual controller, inspired by RetroArch's RetroPad.
+Library for abstracting game-controller input into a stable, RetroPad‑inspired interface. It provides a fast, bitfield‑based state model, parsers for analog sources, and mappers for bridging targets.
+
+Designed for embedded systems, it minimizes RAM use and supports deterministic, task‑based updates.
 
 ## VirtualPad
 - Read only API for controller state.
@@ -11,8 +13,8 @@ Embedded virtual controller, inspired by RetroArch's RetroPad.
  	- Joystick Up/Down/Left/Right
   	- Axis Up/Down
 
-### WriteVirtualPad
-- Inherits from IVirtualPad
+### Writer
+- Inherits from VirtualPad
 - Write/Read API for controller state
 - Support functions to translate "analog" values (Joysticks and Sliders)
 
