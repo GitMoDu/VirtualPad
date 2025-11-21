@@ -1,4 +1,4 @@
-# VirtualPad
+# ![Virtual Pad](https://github.com/GitMoDu/VirtualPad/blob/master/Media/banner.jpg)
 
 Library for abstracting game-controller input into a stable, RetroPad‑inspired interface. It provides a fast, bitfield‑based state model, parsers for analog sources, and mappers for bridging targets.
 
